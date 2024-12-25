@@ -13,9 +13,9 @@ struct TabBarController: View {
           Label("Community", systemImage: "person.3.fill")
         }
 
-      CalendarView()
+      AchievementsView()
         .tabItem {
-          Label("Calendar", systemImage: "calendar")
+          Label("Globe", systemImage: "globe")
         }
 
       ProfileView()
