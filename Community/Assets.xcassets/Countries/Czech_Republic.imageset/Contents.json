@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Czech_Republic.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

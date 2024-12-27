@@ -1,6 +1,17 @@
 import Foundation
 import SwiftUI
 
+struct CountryAchievement: Identifiable, Equatable {
+  let id = UUID()
+  let country: Asset
+  var isUnlocked: Bool
+  var unlockedDate: Date?
+  
+  static func == (lhs: CountryAchievement, rhs: CountryAchievement) -> Bool {
+    lhs.id == rhs.id
+  }
+}
+
 enum Nationality: String, CaseIterable {
   case american = "American"
   case british = "British"
@@ -67,4 +78,26 @@ struct UserModel {
   var location: String
   var bio: String
   var profileImage: UIImage?
+  var unlockedCountries: [CountryAchievement] = []
+  
+  // Helper method to check if a country is unlocked
+  func hasUnlockedCountry(_ country: Asset) -> Bool {
+      unlockedCountries.contains { $0.country == country && $0.isUnlocked }
+  }
+  
+  // Helper method to get unlock date for a country
+  func getUnlockDate(for country: Asset) -> Date? {
+      unlockedCountries.first { $0.country == country }?.unlockedDate
+  }
+  
+  mutating func unlockCountry(_ country: Asset) {
+      if !hasUnlockedCountry(country) {
+          let achievement = CountryAchievement(
+              country: country,
+              isUnlocked: true,
+              unlockedDate: Date()
+          )
+          unlockedCountries.append(achievement)
+      }
+  }
 }
