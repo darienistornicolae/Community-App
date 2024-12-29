@@ -3,7 +3,7 @@ import SwiftUI
 @MainActor
 class AchievementsViewModel: ObservableObject {
   @Published var user: UserModel
-  @Published var allCountries: [CountryAchievement]
+  @Published var allCountries: [CountryAchievementModel]
 
   var unlockedCount: Int {
     allCountries.filter { $0.isUnlocked }.count
@@ -20,7 +20,7 @@ class AchievementsViewModel: ObservableObject {
   init(user: UserModel = .initialUser()) {
     self.user = user
     self.allCountries = Asset.allCases.map { country in
-      CountryAchievement(
+      CountryAchievementModel(
         country: country,
         isUnlocked: user.hasUnlockedCountry(country),
         unlockedDate: user.getUnlockDate(for: country)
