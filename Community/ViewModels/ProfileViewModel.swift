@@ -12,15 +12,8 @@ class ProfileViewModel: ObservableObject {
 
   let posts = (1...12).map { "post\($0)" }
 
-  init() {
-    self.user = UserModel(
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-      nationality: .american,
-      location: "Breda, North Brabant",
-      bio: "I'm a software developer passionate about creating meaningful applications. Love hiking and photography in my free time."
-    )
+  init(user: UserModel = .initialUser()) {
+    self.user = user
   }
 
   private func loadImage() async {
