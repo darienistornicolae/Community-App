@@ -13,61 +13,63 @@ struct CountryAchievement: Identifiable, Equatable {
 }
 
 enum Nationality: String, CaseIterable {
-  case american = "American"
-  case british = "British"
-  case canadian = "Canadian"
-  case australian = "Australian"
-  case german = "German"
-  case french = "French"
-  case italian = "Italian"
-  case spanish = "Spanish"
-  case japanese = "Japanese"
-  case chinese = "Chinese"
-  case indian = "Indian"
-  case brazilian = "Brazilian"
-  case mexican = "Mexican"
-  case russian = "Russian"
-  case korean = "Korean"
-  case dutch = "Dutch"
-  case swedish = "Swedish"
-  case norwegian = "Norwegian"
-  case danish = "Danish"
-  case finnish = "Finnish"
-  case irish = "Irish"
-  case portuguese = "Portuguese"
-  case greek = "Greek"
-  case turkish = "Turkish"
-  case polish = "Polish"
-  case ukrainian = "Ukrainian"
-  case romanian = "Romanian"
-  case hungarian = "Hungarian"
-  case czech = "Czech"
-  case slovak = "Slovak"
-  case swiss = "Swiss"
+  case afghan = "Afghan"
+  case albanian = "Albanian"
+  case andorran = "Andorran"
   case austrian = "Austrian"
+  case bahraini = "Bahraini"
+  case belarusian = "Belarusian"
   case belgian = "Belgian"
-  case newZealander = "New Zealander"
-  case southAfrican = "South African"
-  case argentinian = "Argentinian"
-  case chilean = "Chilean"
-  case colombian = "Colombian"
-  case peruvian = "Peruvian"
-  case venezuelan = "Venezuelan"
-  case egyptian = "Egyptian"
-  case moroccan = "Moroccan"
-  case nigerian = "Nigerian"
-  case kenyan = "Kenyan"
-  case israeli = "Israeli"
-  case saudi = "Saudi"
-  case emirati = "Emirati"
+  case bosnianHerzegovinian = "Bosnian and Herzegovinian"
+  case bulgarian = "Bulgarian"
+  case croatian = "Croatian"
+  case cypriot = "Cypriot"
+  case czech = "Czech"
+  case danish = "Danish"
+  case estonian = "Estonian"
+  case finnish = "Finnish"
+  case french = "French"
+  case german = "German"
+  case greek = "Greek"
+  case hungarian = "Hungarian"
+  case icelandic = "Icelandic"
   case iranian = "Iranian"
-  case pakistani = "Pakistani"
-  case thai = "Thai"
-  case vietnamese = "Vietnamese"
-  case malaysian = "Malaysian"
-  case indonesian = "Indonesian"
-  case filipino = "Filipino"
-  case singaporean = "Singaporean"
+  case iraqi = "Iraqi"
+  case irish = "Irish"
+  case israeli = "Israeli"
+  case italian = "Italian"
+  case jordanian = "Jordanian"
+  case kazakhstani = "Kazakhstani"
+  case kuwaiti = "Kuwaiti"
+  case kosovar = "Kosovar"
+  case latvian = "Latvian"
+  case lebanese = "Lebanese"
+  case lithuanian = "Lithuanian"
+  case maltese = "Maltese"
+  case moldovan = "Moldovan"
+  case montenegrin = "Montenegrin"
+  case dutch = "Dutch"
+  case northMacedonian = "North Macedonian"
+  case norwegian = "Norwegian"
+  case omani = "Omani"
+  case polish = "Polish"
+  case portuguese = "Portuguese"
+  case qatari = "Qatari"
+  case romanian = "Romanian"
+  case russian = "Russian"
+  case saudiArabian = "Saudi Arabian"
+  case serbian = "Serbian"
+  case slovak = "Slovak"
+  case slovenian = "Slovenian"
+  case spanish = "Spanish"
+  case swedish = "Swedish"
+  case swiss = "Swiss"
+  case syrian = "Syrian"
+  case turkish = "Turkish"
+  case ukrainian = "Ukrainian"
+  case emirati = "Emirati"
+  case british = "British"
+  case yemeni = "Yemeni"
 }
 
 struct UserModel {
@@ -79,25 +81,36 @@ struct UserModel {
   var bio: String
   var profileImage: UIImage?
   var unlockedCountries: [CountryAchievement] = []
-  
-  // Helper method to check if a country is unlocked
+
   func hasUnlockedCountry(_ country: Asset) -> Bool {
       unlockedCountries.contains { $0.country == country && $0.isUnlocked }
   }
-  
-  // Helper method to get unlock date for a country
+
   func getUnlockDate(for country: Asset) -> Date? {
       unlockedCountries.first { $0.country == country }?.unlockedDate
   }
-  
+
   mutating func unlockCountry(_ country: Asset) {
-      if !hasUnlockedCountry(country) {
-          let achievement = CountryAchievement(
-              country: country,
-              isUnlocked: true,
-              unlockedDate: Date()
-          )
-          unlockedCountries.append(achievement)
-      }
+    if !hasUnlockedCountry(country) {
+      let achievement = CountryAchievement(
+        country: country,
+        isUnlocked: true,
+        unlockedDate: Date()
+      )
+      unlockedCountries.append(achievement)
+    }
+  }
+  
+  static func initialUser() -> UserModel {
+    UserModel(
+      id: 1,
+      name: "John Doe",
+      email: "john.doe@example.com",
+      nationality: .british,
+      location: "London, United Kingdom",
+      bio: "Explorer and traveler, passionate about discovering new cultures and meeting people from around the world. Always eager to learn about different traditions and share experiences.",
+      profileImage: nil,
+      unlockedCountries: []
+    )
   }
 }

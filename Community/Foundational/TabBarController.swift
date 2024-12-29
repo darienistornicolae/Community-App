@@ -15,7 +15,7 @@ struct TabBarController: View {
 
       AchievementsView()
         .tabItem {
-          Label("Globe", systemImage: "globe")
+          Label("Achievements", systemImage: "globe")
         }
 
       ProfileView()

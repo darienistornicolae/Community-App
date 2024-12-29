@@ -17,16 +17,7 @@ class AchievementsViewModel: ObservableObject {
     Double(unlockedCount) / Double(totalCount)
   }
 
-  init(
-    user: UserModel = UserModel(
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      nationality: .american,
-      location: "New York",
-      bio: "Explorer"
-    )
-  ) {
+  init(user: UserModel = .initialUser()) {
     self.user = user
     self.allCountries = Asset.allCases.map { country in
       CountryAchievement(
