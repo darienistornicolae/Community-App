@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct CountryAchievementCell: View {
-  let achievement: CountryAchievement
+  let achievement: CountryAchievementModel
 
   var body: some View {
     VStack {

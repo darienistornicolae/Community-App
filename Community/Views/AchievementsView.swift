@@ -2,7 +2,7 @@ import SwiftUI
 
 struct AchievementsView: View {
   @StateObject private var viewModel = AchievementsViewModel()
-  @State private var selectedCountry: CountryAchievement?
+  @State private var selectedCountry: CountryAchievementModel?
 
   let columns = [
     GridItem(.adaptive(minimum: 100), spacing: Spacing.default)
