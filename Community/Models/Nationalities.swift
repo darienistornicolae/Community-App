@@ -1,6 +1,6 @@
 import Foundation
 
-enum Nationality: String, CaseIterable {
+enum Nationality: String, CaseIterable, Codable {
   case afghan = "Afghan"
   case albanian = "Albanian"
   case andorran = "Andorran"

@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum Asset: String, Equatable, CaseIterable {
+enum Asset: String, Equatable, CaseIterable, Codable {
   case afghanistanFlag = "Afghanistan"
   case albaniaFlag = "Albania"
   case andorraFlag = "Andorra"
