@@ -1,7 +1,8 @@
-//
-//  HomeView.swift
-//  Community
-//
-//  Created by Nik Dostov on 02/01/2025.
-//
+import Foundation
+import SwiftUI
+
+@MainActor
+class HomeViewModel: ObservableObject {
+ 
+}
 
