@@ -12,17 +12,17 @@ class LoginViewModel: ObservableObject {
   
   
   func authenticateUser(username: String, password: String) {
-          if username.lowercased() == "mario2021" {
-              wrongUsername = 0
-              if password.lowercased() == "abc123" {
-                  wrongPassword = 0
-                  isShowingLoginScreen = true
-              } else {
-                  wrongPassword = 2
-              }
-          } else {
-              wrongUsername = 2
-          }
+    if username.lowercased() == "mario2021" {
+      wrongUsername = 0
+      if password.lowercased() == "abc123" {
+        wrongPassword = 0
+        isShowingLoginScreen = true
+      } else {
+        wrongPassword = 2
       }
- 
+    } else {
+      wrongUsername = 2
+    }
+  }
+  
 }
