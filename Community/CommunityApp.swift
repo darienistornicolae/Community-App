@@ -4,7 +4,7 @@ import SwiftUI
 struct CommunityApp: App {
   var body: some Scene {
     WindowGroup {
-      TabBarController()
+      RootView()
     }
   }
 }

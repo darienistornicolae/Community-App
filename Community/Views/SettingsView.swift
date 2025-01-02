@@ -6,12 +6,14 @@ enum SettingsDestination: Hashable {
   case notifications
   case help
   case about
+  case logOut
 }
 
 struct SettingsView: View {
   @Environment(\.dismiss) var dismiss
   @State private var destination: SettingsDestination?
-
+  @AppStorage("isShowingLoginScreen") private var isShowingLoginScreen: Bool = false
+  
   var body: some View {
     NavigationStack {
       List {
@@ -23,7 +25,7 @@ struct SettingsView: View {
             action: { destination = .editProfile }
           )
         }
-
+        
         Section("Support") {
           SettingsRow(
             icon: "questionmark.circle.fill",
@@ -31,7 +33,7 @@ struct SettingsView: View {
             color: .blue,
             action: { destination = .help }
           )
-
+          
           SettingsRow(
             icon: "info.circle.fill",
             title: "About",
@@ -39,13 +41,17 @@ struct SettingsView: View {
             action: { destination = .about }
           )
         }
-
+        
         Section {
           SettingsRow(
             icon: "rectangle.portrait.and.arrow.right",
             title: "Log Out",
             color: .red,
-            showNavigation: false
+            showNavigation: false,
+            action:
+              {
+                isShowingLoginScreen = false
+              }
           )
         }
       }
@@ -75,6 +81,9 @@ struct SettingsView: View {
         case .about:
           Text("About App")
             .navigationTitle("About")
+        case .logOut:
+          Text("Log Out")
+            .navigationTitle("Log Out")
         }
       }
     }
