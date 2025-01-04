@@ -34,6 +34,11 @@ class AchievementsViewModel: ObservableObject {
   func unlockCountry(_ country: Asset) async {
     if let index = allCountries.firstIndex(where: { $0.country == country }) {
       var achievement = allCountries[index]
+
+      if achievement.isUnlockedBy(userId: user.id) {
+        return
+      }
+
       let unlockInfo = CountryAchievementModel.UnlockInfo(userId: user.id)
       achievement.unlockedBy.append(unlockInfo)
       allCountries[index] = achievement
