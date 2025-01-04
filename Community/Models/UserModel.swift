@@ -11,7 +11,7 @@ enum UserId: String {
   static var current: UserId = .user1
 }
 
-struct UserModel: FirestoreConvertible {
+struct UserModel {
   let id: String
   var name: String
   var email: String
@@ -41,6 +41,20 @@ struct UserModel: FirestoreConvertible {
     self.achievementIds = achievementIds
   }
 
+  static func initialUser() -> UserModel {
+    UserModel(
+      name: "John Doe",
+      email: "john.doe@example.com",
+      nationality: .british,
+      location: "London, United Kingdom",
+      bio: "Explorer and traveler, passionate about discovering new cultures and meeting people from around the world. Always eager to learn about different traditions and share experiences.",
+      profileImage: nil
+    )
+  }
+}
+
+// MARK: Firestore Convertible
+extension UserModel: FirestoreConvertible {
   static func fromFirestore(_ dict: [String: Any]) -> UserModel {
     UserModel(
       id: dict["id"] as? String ?? "",
@@ -66,14 +80,4 @@ struct UserModel: FirestoreConvertible {
     ]
   }
 
-  static func initialUser() -> UserModel {
-    UserModel(
-      name: "John Doe",
-      email: "john.doe@example.com",
-      nationality: .british,
-      location: "London, United Kingdom",
-      bio: "Explorer and traveler, passionate about discovering new cultures and meeting people from around the world. Always eager to learn about different traditions and share experiences.",
-      profileImage: nil
-    )
-  }
 }
