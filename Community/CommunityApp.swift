@@ -6,7 +6,7 @@ struct CommunityApp: App {
 
   var body: some Scene {
     WindowGroup {
-      RootView()
+      LoginCheckView()
     }
   }
 }

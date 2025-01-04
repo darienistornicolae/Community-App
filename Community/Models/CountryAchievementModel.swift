@@ -2,9 +2,9 @@ import Foundation
 import FirebaseFirestore
 
 struct CountryAchievementModel: Identifiable, FirestoreConvertible {
-  let id: String  // country.rawValue
+  let id: String
   let country: Asset
-  var unlockedBy: [UnlockInfo] // Array of unlock info
+  var unlockedBy: [UnlockInfo]
 
   struct UnlockInfo {
     let userId: String

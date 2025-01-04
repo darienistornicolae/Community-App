@@ -6,7 +6,7 @@ import SwiftUI
 class ProfileViewModel: ObservableObject {
   @Published var user: UserModel
   @Published var showingSettings = false
-  @Published var selectedItem: PhotosPickerItem? {
+  @Published var selectedPhoto: PhotosPickerItem? {
     didSet { Task { await loadImage() } }
   }
 
@@ -21,7 +21,22 @@ class ProfileViewModel: ObservableObject {
     }
   }
 
-  private func loadUser() async {
+  func updateUser() async throws {
+    let userData: [String: Any] = [
+      "name": user.name,
+      "email": user.email,
+      "nationality": user.nationality.rawValue,
+      "location": user.location,
+      "bio": user.bio,
+      "achievementIds": user.achievementIds
+    ]
+    try await userManager.updateDocument(id: user.id, data: userData)
+  }
+}
+
+// MARK: Private
+private extension ProfileViewModel {
+  func loadUser() async {
     do {
       let loadedUser = try await userManager.getDocument(id: user.id)
       user = loadedUser
@@ -32,7 +47,7 @@ class ProfileViewModel: ObservableObject {
     }
   }
 
-  private func createUser() async throws {
+  func createUser() async throws {
     let userData: [String: Any] = [
       "id": user.id,
       "name": user.name,
@@ -45,20 +60,8 @@ class ProfileViewModel: ObservableObject {
     try await userManager.createDocument(id: user.id, data: userData)
   }
 
-  func updateUser() async throws {
-    let userData: [String: Any] = [
-      "name": user.name,
-      "email": user.email,
-      "nationality": user.nationality.rawValue,
-      "location": user.location,
-      "bio": user.bio,
-      "achievementIds": user.achievementIds
-    ]
-    try await userManager.updateDocument(id: user.id, data: userData)
-  }
-
-  private func loadImage() async {
-    guard let item = selectedItem else { return }
+  func loadImage() async {
+    guard let item = selectedPhoto else { return }
 
     do {
       guard let data = try await item.loadTransferable(type: Data.self) else { return }

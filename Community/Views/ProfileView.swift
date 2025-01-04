@@ -10,7 +10,7 @@ struct ProfileView: View {
         Section {
           HStack {
             let profileImage = viewModel.user.profileImage
-            PhotosPicker(selection: $viewModel.selectedItem, matching: .images) {
+            PhotosPicker(selection: $viewModel.selectedPhoto, matching: .images) {
               ProfileImageView(image: profileImage)
             }
 

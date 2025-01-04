@@ -7,19 +7,19 @@ class AchievementsViewModel: ObservableObject {
   @Published var allCountries: [CountryAchievementModel]
   private let userManager: FirestoreManager<UserModel>
   private let achievementsManager: FirestoreManager<CountryAchievementModel>
-  
+
   var unlockedCount: Int {
     allCountries.filter { $0.isUnlockedBy(userId: user.id) }.count
   }
-  
+
   var totalCount: Int {
     allCountries.count
   }
-  
+
   var progressPercentage: Double {
     Double(unlockedCount) / Double(totalCount)
   }
-  
+
   init(user: UserModel = .initialUser()) {
     self.user = user
     self.userManager = FirestoreManager(collection: "users")
@@ -30,7 +30,44 @@ class AchievementsViewModel: ObservableObject {
       await loadData()
     }
   }
-  
+
+  func unlockCountry(_ country: Asset) async {
+    if let index = allCountries.firstIndex(where: { $0.country == country }) {
+      var achievement = allCountries[index]
+      let unlockInfo = CountryAchievementModel.UnlockInfo(userId: user.id)
+      achievement.unlockedBy.append(unlockInfo)
+      allCountries[index] = achievement
+
+      do {
+        try await achievementsManager.updateDocument(
+          id: achievement.id,
+          data: [
+            "unlockedBy": FieldValue.arrayUnion([unlockInfo.toFirestore()])
+          ]
+        )
+
+        if !user.achievementIds.contains(achievement.id) {
+          user.achievementIds.append(achievement.id)
+          try await userManager.updateDocument(id: user.id, data: [
+            "achievementIds": user.achievementIds
+          ])
+        }
+      } catch {
+        print("Error updating achievement: \(error)")
+      }
+    }
+  }
+
+  func hasUnlockedCountry(_ country: Asset) -> Bool {
+    allCountries.first { $0.country == country }?.isUnlockedBy(userId: user.id) ?? false
+  }
+
+  func getUnlockDate(for country: Asset) -> Date? {
+    allCountries.first { $0.country == country }?.getUnlockInfo(for: user.id)?.unlockedDate.dateValue()
+  }
+}
+
+private extension AchievementsViewModel {
   private func loadData() async {
     do {
       let loadedUser = try await userManager.getDocument(id: user.id)
@@ -46,6 +83,10 @@ class AchievementsViewModel: ObservableObject {
     }
   }
   
+/*
+ The following functions are mock up functions to create initial
+ achievements for the user
+*/
   private func loadOrCreateAchievements() async {
     do {
       let achievements = try await achievementsManager.fetch()
@@ -95,40 +136,5 @@ class AchievementsViewModel: ObservableObject {
     try? await userManager.updateDocument(id: user.id, data: [
       "achievementIds": user.achievementIds
     ])
-  }
-
-  func unlockCountry(_ country: Asset) async {
-    if let index = allCountries.firstIndex(where: { $0.country == country }) {
-      var achievement = allCountries[index]
-      let unlockInfo = CountryAchievementModel.UnlockInfo(userId: user.id)
-      achievement.unlockedBy.append(unlockInfo)
-      allCountries[index] = achievement
-      
-      do {
-        try await achievementsManager.updateDocument(
-          id: achievement.id,
-          data: [
-            "unlockedBy": FieldValue.arrayUnion([unlockInfo.toFirestore()])
-          ]
-        )
-
-        if !user.achievementIds.contains(achievement.id) {
-          user.achievementIds.append(achievement.id)
-          try await userManager.updateDocument(id: user.id, data: [
-            "achievementIds": user.achievementIds
-          ])
-        }
-      } catch {
-        print("Error updating achievement: \(error)")
-      }
-    }
-  }
-  
-  func hasUnlockedCountry(_ country: Asset) -> Bool {
-    allCountries.first { $0.country == country }?.isUnlockedBy(userId: user.id) ?? false
-  }
-  
-  func getUnlockDate(for country: Asset) -> Date? {
-    allCountries.first { $0.country == country }?.getUnlockInfo(for: user.id)?.unlockedDate.dateValue()
   }
 }

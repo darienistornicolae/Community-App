@@ -7,7 +7,7 @@ struct LoginCheckView: View {
     if isShowingLoginScreen{
       TabBarController()
     }
-    else{
+    else {
       LoginView()
     }
   }
