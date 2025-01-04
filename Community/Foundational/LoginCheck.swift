@@ -1,15 +1,13 @@
 import SwiftUI
 
-struct RootView: View {
+struct LoginCheckView: View {
   @AppStorage("isShowingLoginScreen") private var isShowingLoginScreen: Bool = false
   
   var body: some View {
-    if isShowingLoginScreen
-    {
+    if isShowingLoginScreen{
       TabBarController()
     }
-    else
-    {
+    else{
       LoginView()
     }
   }
