@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct FloatingActionButton: View {
-  @State private var isExpanded = false
+  @State private var isExpanded: Bool = false
 
   var body: some View {
     ZStack {
