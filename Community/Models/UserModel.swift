@@ -8,7 +8,7 @@ enum UserId: String {
   case user4 = "user_004"
   case user5 = "user_005"
 
-  static var current: UserId = .user1
+  static var current: UserId = .user4
 }
 
 struct UserModel {
@@ -20,6 +20,8 @@ struct UserModel {
   var bio: String
   var profileImage: UIImage?
   var achievementIds: [String]
+  var points: Int
+  var pointsHistory: [PointsTransaction]
 
   init(
     id: String = UserId.current.rawValue,
@@ -29,7 +31,9 @@ struct UserModel {
     location: String,
     bio: String,
     profileImage: UIImage?,
-    achievementIds: [String] = []
+    achievementIds: [String] = [],
+    points: Int = 0,
+    pointsHistory: [PointsTransaction] = []
   ) {
     self.id = id
     self.name = name
@@ -39,6 +43,8 @@ struct UserModel {
     self.bio = bio
     self.profileImage = profileImage
     self.achievementIds = achievementIds
+    self.points = points
+    self.pointsHistory = pointsHistory
   }
 
   static func initialUser() -> UserModel {
@@ -48,7 +54,17 @@ struct UserModel {
       nationality: .british,
       location: "London, United Kingdom",
       bio: "Explorer and traveler, passionate about discovering new cultures and meeting people from around the world. Always eager to learn about different traditions and share experiences.",
-      profileImage: nil
+      profileImage: nil,
+      points: 50,
+      pointsHistory: [
+        PointsTransaction(
+          userId: UserId.current.rawValue,
+          amount: 50,
+          type: .initial,
+          description: "Welcome bonus points",
+          timestamp: Date()
+        )
+      ]
     )
   }
 }
@@ -56,7 +72,11 @@ struct UserModel {
 // MARK: Firestore Convertible
 extension UserModel: FirestoreConvertible {
   static func fromFirestore(_ dict: [String: Any]) -> UserModel {
-    UserModel(
+    let pointsHistory = (dict["pointsHistory"] as? [[String: Any]] ?? []).map { 
+      PointsTransaction.fromFirestore($0)
+    }
+
+    return UserModel(
       id: dict["id"] as? String ?? "",
       name: dict["name"] as? String ?? "",
       email: dict["email"] as? String ?? "",
@@ -64,7 +84,9 @@ extension UserModel: FirestoreConvertible {
       location: dict["location"] as? String ?? "",
       bio: dict["bio"] as? String ?? "",
       profileImage: nil,
-      achievementIds: dict["achievementIds"] as? [String] ?? []
+      achievementIds: dict["achievementIds"] as? [String] ?? [],
+      points: dict["points"] as? Int ?? 0,
+      pointsHistory: pointsHistory
     )
   }
 
@@ -76,8 +98,9 @@ extension UserModel: FirestoreConvertible {
       "nationality": nationality.rawValue,
       "location": location,
       "bio": bio,
-      "achievementIds": achievementIds
+      "achievementIds": achievementIds,
+      "points": points,
+      "pointsHistory": pointsHistory.map { $0.toFirestore() }
     ]
   }
-
 }
