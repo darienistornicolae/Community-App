@@ -28,6 +28,27 @@ struct ProfileView: View {
           .padding(.vertical, Spacing.small)
         }
 
+        Section {
+          HStack {
+            Image(systemName: "star.circle.fill")
+              .foregroundColor(.yellow)
+            Text("\(viewModel.currentPoints) points")
+              .font(.headline)
+          }
+
+          if !viewModel.pointsHistory.isEmpty {
+            NavigationLink {
+              PointsTransactionView(transactions: viewModel.pointsHistory)
+            } label: {
+              HStack {
+                Image(systemName: "clock.arrow.circlepath")
+                  .foregroundColor(.blue)
+                Text("Points History")
+              }
+            }
+          }
+        }
+
         Section("Bio") {
           HStack {
             Image(systemName: "location.fill")
