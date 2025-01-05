@@ -10,7 +10,7 @@ struct HomeView: View {
       VStack {
         Spacer()
         HStack {
-          TabBarController
+//          TabBarController
           Spacer()
           FloatingActionButton()
         }
