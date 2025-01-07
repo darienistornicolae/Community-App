@@ -2,16 +2,21 @@ import SwiftUI
 
 struct FloatingActionButton: View {
   @State private var isExpanded: Bool = false
-
+  
   var body: some View {
-    ZStack {
-      if isExpanded {
-        quizCreationButton
-        eventCreationButton
+    NavigationStack {
+      ZStack(alignment: .bottomTrailing){
+        Color.clear // Ensure ZStack fills the screen
+                            .edgesIgnoringSafeArea(.all)
+        if isExpanded {
+          quizCreationButton
+          eventCreationButton
+        }
+        
+        primaryButton
       }
-      primaryButton
-    }
-    .padding()
+      .padding()
+  }
   }
 }
 
@@ -40,8 +45,9 @@ private extension FloatingActionButton {
   }
 
   var quizCreationButton: some View {
-    Button {
-
+    NavigationLink{
+      QuizCreationView()
+    
     } label: {
       Image(systemName: "questionmark.circle.fill")
         .foregroundColor(.white)
@@ -51,14 +57,14 @@ private extension FloatingActionButton {
         .clipShape(Circle())
         .shadow(radius: 4)
     }
-    .offset(y: -120)
+    .offset(y: -130)
     .transition(.move(edge: .bottom).combined(with: .opacity))
     .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isExpanded)
   }
 
   var eventCreationButton: some View {
-    Button {
-
+      NavigationLink{
+        EventCreationView()
     } label: {
       Image(systemName: "square.and.pencil")
         .foregroundColor(.white)
@@ -68,8 +74,10 @@ private extension FloatingActionButton {
         .clipShape(Circle())
         .shadow(radius: 4)
     }
-    .offset(y: -60)
+    .offset(y: -70)
     .transition(.move(edge: .bottom).combined(with: .opacity))
     .animation(.spring(response: 0.4, dampingFraction: 0.7).delay(0.1), value: isExpanded)
   }
 }
+
+

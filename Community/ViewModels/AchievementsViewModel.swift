@@ -39,7 +39,7 @@ class AchievementsViewModel: ObservableObject {
         return
       }
 
-      let unlockInfo = CountryAchievementModel.UnlockInfo(userId: user.id)
+      let unlockInfo = CountryAchievementModel.AchievementUnlockModel(userId: user.id)
       achievement.unlockedBy.append(unlockInfo)
       allCountries[index] = achievement
 
