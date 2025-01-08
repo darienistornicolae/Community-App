@@ -3,12 +3,6 @@ import SwiftUI
 
 struct PointsTransactionView: View {
   let transactions: [PointsTransaction]
-  private let dateFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .medium
-    formatter.timeStyle = .short
-    return formatter
-  }()
 
   var body: some View {
     List(transactions, id: \.timestamp) { transaction in
@@ -32,7 +26,7 @@ struct PointsTransactionView: View {
             .foregroundColor(transaction.amount >= 0 ? .green : .red)
         }
 
-        Text(dateFormatter.string(from: transaction.timestamp))
+        Text(DateFormatter.eventTime.string(from: transaction.timestamp))
           .font(.caption2)
           .foregroundColor(.gray)
       }
