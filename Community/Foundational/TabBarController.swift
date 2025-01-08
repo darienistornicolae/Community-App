@@ -25,8 +25,6 @@ struct TabBarController: View {
     }
   }
 }
-
-
 #Preview {
   TabBarController()
 }

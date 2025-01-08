@@ -21,11 +21,9 @@ struct EventCreationView: View {
           showImagePicker.toggle()
         }) {
           ZStack {
-            
             RoundedRectangle(cornerRadius: 20)
               .stroke(Color.gray, lineWidth: 3)
               .frame(width: 300, height: 300)
-            
             
             if let selectedImage = selectedImage {
               Image(uiImage: selectedImage)
@@ -47,18 +45,17 @@ struct EventCreationView: View {
           ImagePicker(selectedImage: $selectedImage)
         }
         
-        
         Section(header: Text("Event Details")) {
           TextField("Event Title", text: $eventTitle)
           Text("Description")
-                  .font(.headline)
-
-              TextEditor(text: $description)
-                  .frame(height: 150) // Adjust height as needed
-                  .border(Color.gray, width: 0.5)
-                  .cornerRadius(5)
-                  .padding(.vertical, 5)
-                  .padding(.horizontal, 15)
+            .font(.headline)
+          
+          TextEditor(text: $description)
+            .frame(height: 150) // Adjust height as needed
+            .border(Color.gray, width: 0.5)
+            .cornerRadius(5)
+            .padding(.vertical, 5)
+            .padding(.horizontal, 15)
         }
         
         Picker("Event Price", selection: $selectedNumber) {
@@ -68,10 +65,8 @@ struct EventCreationView: View {
         }
         .pickerStyle(MenuPickerStyle())
       }
-      //      Spacer()
       
       Button(action: {
-        // Handle quiz creation logic here
       }) {
         Text("Save Quiz")
           .foregroundColor(.white)
@@ -85,4 +80,6 @@ struct EventCreationView: View {
   }
 }
 
-
+#Preview {
+  EventCreationView()
+}
