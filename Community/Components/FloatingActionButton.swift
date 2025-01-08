@@ -1,8 +1,15 @@
 import SwiftUI
 
+private enum PresentationView: Identifiable {
+  case quizCreation
+  case eventCreation
+
+  var id: Self { self }
+}
+
 struct FloatingActionButton: View {
   @State private var isExpanded: Bool = false
-
+  @State private var presentationView: PresentationView?
   var body: some View {
     ZStack {
       if isExpanded {
@@ -12,6 +19,14 @@ struct FloatingActionButton: View {
       primaryButton
     }
     .padding()
+    .fullScreenCover(item: $presentationView) { item in
+      switch item {
+      case .quizCreation:
+        ProfileView()
+      case .eventCreation:
+        EventCreationView()
+      }
+    }
   }
 }
 
@@ -58,7 +73,7 @@ private extension FloatingActionButton {
 
   var eventCreationButton: some View {
     Button {
-
+      presentationView = .eventCreation
     } label: {
       Image(systemName: "square.and.pencil")
         .foregroundColor(.white)
