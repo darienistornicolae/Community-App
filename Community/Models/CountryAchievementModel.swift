@@ -45,7 +45,7 @@ struct CountryAchievementModel: Identifiable, FirestoreConvertible {
   func getUnlockInfo(for userId: String) -> AchievementUnlockModel? {
     unlockedBy.first { $0.userId == userId }
   }
-
+  
   struct AchievementUnlockModel {
     let userId: String
     let unlockedDate: Timestamp
@@ -68,6 +68,5 @@ struct CountryAchievementModel: Identifiable, FirestoreConvertible {
         "unlockedDate": unlockedDate
       ]
     }
-    
   }
 }

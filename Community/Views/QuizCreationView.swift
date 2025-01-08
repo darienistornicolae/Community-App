@@ -1,12 +1,7 @@
 import SwiftUI
-import UIKit
 
 struct QuizCreationView: View {
   @State private var question: String = ""
-  //  @State private var answer1: String = ""
-  //  @State private var answer2: String = ""
-  //  @State private var answer3: String = ""
-  //  @State private var answer4: String = ""
   @State private var answers: [String] = ["", "", "", ""]
   @State private var selectedValues: [Int] = [0, 0, 0, 0]
   @State private var selectedAnswerIndex: Int? = nil
@@ -55,15 +50,6 @@ struct QuizCreationView: View {
           .foregroundColor(.gray)
           .padding(.bottom, 20)
         
-        
-        //          Section(header: Text("Quiz Details")) {
-        //            TextField("Question", text: $question)
-        //            TextField("Answer 1", text: $answer1)
-        //            TextField("Answer 2", text: $answer2)
-        //            TextField("Answer 3", text: $answer3)
-        //            TextField("Answer 4", text: $answer4)
-        //          }
-        
         Section(header: Text("Quiz Details")) {
           TextField("Question", text: $question)
           
@@ -75,11 +61,9 @@ struct QuizCreationView: View {
                 get: { selectedValues[index] == 1 },
                 set: { isOn in
                   if isOn {
-                    // Set the selected value to 1 and reset others to 0
                     selectedValues = [Int](repeating: 0, count: answers.count)
                     selectedValues[index] = 1
                   } else {
-                    // Reset the selected value to 0 if toggled off
                     selectedValues[index] = 0
                   }
                 }

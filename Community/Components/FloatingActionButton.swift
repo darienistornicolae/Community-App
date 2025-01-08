@@ -2,12 +2,11 @@ import SwiftUI
 
 struct FloatingActionButton: View {
   @State private var isExpanded: Bool = false
-  
   var body: some View {
     NavigationStack {
       ZStack(alignment: .bottomTrailing){
-        Color.clear // Ensure ZStack fills the screen
-                            .edgesIgnoringSafeArea(.all)
+        Color.clear
+          .edgesIgnoringSafeArea(.all)
         if isExpanded {
           quizCreationButton
           eventCreationButton
@@ -16,7 +15,7 @@ struct FloatingActionButton: View {
         primaryButton
       }
       .padding()
-  }
+    }
   }
 }
 
@@ -43,11 +42,11 @@ private extension FloatingActionButton {
         .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isExpanded)
     }
   }
-
+  
   var quizCreationButton: some View {
     NavigationLink{
       QuizCreationView()
-    
+      
     } label: {
       Image(systemName: "questionmark.circle.fill")
         .foregroundColor(.white)
@@ -61,10 +60,10 @@ private extension FloatingActionButton {
     .transition(.move(edge: .bottom).combined(with: .opacity))
     .animation(.spring(response: 0.4, dampingFraction: 0.7), value: isExpanded)
   }
-
+  
   var eventCreationButton: some View {
-      NavigationLink{
-        EventCreationView()
+    NavigationLink{
+      EventCreationView()
     } label: {
       Image(systemName: "square.and.pencil")
         .foregroundColor(.white)
