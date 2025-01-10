@@ -75,27 +75,9 @@ private extension HomeViewModel {
       .store(in: &cancellables)
   }
 
-  func setupEventsListener() {
-    let db = Firestore.firestore()
-    eventsListener = db.collection("events")
-      .addSnapshotListener { [weak self] snapshot, error in
-        guard let self = self else { return }
-        
-        if let error = error {
-          print("Error listening for event updates: \(error)")
-          return
-        }
-        
-        guard let documents = snapshot?.documents else {
-          print("No events found")
-          return
-        }
-        
-        self.events = documents.compactMap { document in
-          var data = document.data()
-          data["id"] = document.documentID
-          return EventModel.fromFirestore(data)
-        }.sorted { $0.date > $1.date }
-      }
+  private func setupEventsListener() {
+    eventsListener = eventManager.listen { [weak self] events in
+      self?.events = events.sorted { $0.date > $1.date }
+    }
   }
 }
