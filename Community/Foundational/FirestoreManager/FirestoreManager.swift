@@ -16,6 +16,7 @@ protocol FirestoreProtocol {
   func updateDocument(id: String, data: [String: Any]) async throws
   func getDocument(id: String) async throws -> T
   func createDocument(id: String, data: [String: Any]) async throws
+  func listen(onChange: @escaping ([T]) -> Void) -> ListenerRegistration
 }
 
 enum FirestoreError: LocalizedError {
@@ -58,11 +59,35 @@ final class FirestoreManager<T: FirestoreConvertible>: FirestoreProtocol {
           }
 
           let items = documents.map { document in
-            T.fromFirestore(document.data())
+            var data = document.data()
+            data["id"] = document.documentID
+            return T.fromFirestore(data)
           }
           continuation.resume(returning: items)
         }
     }
+  }
+
+  func listen(onChange: @escaping ([T]) -> Void) -> ListenerRegistration {
+    dataBase.collection(collection)
+      .addSnapshotListener { snapshot, error in
+        if let error = error {
+          print("Error listening for updates: \(error)")
+          return
+        }
+
+        guard let documents = snapshot?.documents else {
+          print("No documents found")
+          return
+        }
+
+        let items = documents.map { document in
+          var data = document.data()
+          data["id"] = document.documentID
+          return T.fromFirestore(data)
+        }
+        onChange(items)
+      }
   }
 
   func upload(_ item: T) async throws {
@@ -91,12 +116,14 @@ final class FirestoreManager<T: FirestoreConvertible>: FirestoreProtocol {
   func getDocument(id: String) async throws -> T {
     do {
       let document = try await dataBase.collection(collection).document(id).getDocument()
-      
+
       guard let data = document.data() else {
         throw FirestoreError.invalidData
       }
-      
-      return T.fromFirestore(data)
+
+      var documentData = data
+      documentData["id"] = document.documentID
+      return T.fromFirestore(documentData)
     } catch {
       throw FirestoreError.failedToFetch
     }
