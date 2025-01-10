@@ -1,9 +1,10 @@
 import SwiftUI
  
 struct TabBarController: View {
+  @StateObject private var homeViewModel = HomeViewModel()
   var body: some View {
     TabView {
-      HomeView()
+      HomeView(viewModel: homeViewModel)
         .tabItem {
           Label("Home", systemImage: "house.fill")
         }

@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct HomeView: View {
-  @StateObject private var viewModel = HomeViewModel()
+  @ObservedObject var viewModel: HomeViewModel
 
   var body: some View {
     ZStack {
@@ -27,7 +27,7 @@ struct HomeView: View {
         .navigationTitle("Community Events")
         .navigationBarTitleDisplayMode(.large)
         .refreshable {
-          await viewModel.fetchEvents()
+          await viewModel.refresh()
         }
       }
       floatingButton
@@ -36,7 +36,7 @@ struct HomeView: View {
 }
 
 #Preview {
-  HomeView()
+  HomeView(viewModel: HomeViewModel())
     .environmentObject(PointsManager.shared)
 }
 

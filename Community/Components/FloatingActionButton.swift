@@ -22,7 +22,7 @@ struct FloatingActionButton: View {
     .fullScreenCover(item: $presentationView) { item in
       switch item {
       case .quizCreation:
-        ProfileView()
+        QuizCreationView()
       case .eventCreation:
         EventCreationView()
       }
@@ -56,7 +56,7 @@ private extension FloatingActionButton {
 
   var quizCreationButton: some View {
     Button {
-
+      presentationView = .quizCreation
     } label: {
       Image(systemName: "questionmark.circle.fill")
         .foregroundColor(.white)
