@@ -58,7 +58,3 @@ struct LoginView: View {
     }
   }
 }
-
-#Preview {
-  HomeView()
-}

@@ -8,15 +8,8 @@ struct EventCard: View {
   @State private var showingPaymentAlert = false
   @State private var showingErrorAlert = false
   @State private var showingParticipants = false
+  @State private var showingQuiz = false
   @State private var errorMessage = ""
-
-  private var isParticipating: Bool {
-    event.participants.contains(currentUserId)
-  }
-
-  private var isCreator: Bool {
-    event.userId == currentUserId
-  }
 
   var body: some View {
     VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -37,17 +30,17 @@ struct EventCard: View {
       HStack {
         Label(event.location, systemImage: "location.fill")
         Spacer()
-        Label(DateFormatter.eventTime.string(from: event.date), systemImage: "calendar")
+        Label(event.formattedDate, systemImage: "calendar")
       }
       .font(.caption)
       .foregroundColor(.gray)
 
       HStack {
-        if isCreator {
+        if event.isCreator(userId: currentUserId) {
           Button {
             showingParticipants = true
           } label: {
-            Label("\(event.participants.count) participants", systemImage: "person.2.fill")
+            Label(event.formattedParticipants, systemImage: "person.2.fill")
               .font(.subheadline)
               .foregroundColor(.blue)
               .padding(.horizontal, Spacing.medium)
@@ -56,15 +49,15 @@ struct EventCard: View {
               .cornerRadius(Spacing.small)
           }
         } else {
-          Label("\(event.participants.count) participants", systemImage: "person.2.fill")
+          Label(event.formattedParticipants, systemImage: "person.2.fill")
             .font(.caption)
             .foregroundColor(.gray)
         }
 
         Spacer()
 
-        if !isCreator {
-          if isParticipating {
+        if !event.isCreator(userId: currentUserId) {
+          if event.isParticipating(userId: currentUserId) {
             Text("Joined")
               .font(.headline)
               .foregroundColor(.green)
@@ -73,7 +66,7 @@ struct EventCard: View {
               .background(Color.green.opacity(0.2))
               .cornerRadius(20)
           } else {
-            Button(action: { showingPaymentAlert = true }) {
+            Button(action: { showingQuiz = true }) {
               Text("\(event.price) Points")
                 .font(.headline)
                 .foregroundColor(.white)
@@ -101,6 +94,13 @@ struct EventCard: View {
     .sheet(isPresented: $showingParticipants) {
       ParticipantsView(viewModel: ParticipantsViewModel(eventId: event.id))
         .presentationDetents([.medium])
+    }
+    .sheet(isPresented: $showingQuiz) {
+      QuizView(eventId: event.id) { success in
+        if success {
+          showingPaymentAlert = true
+        }
+      }
     }
     .alert("Join Event", isPresented: $showingPaymentAlert) {
       Button("Cancel", role: .cancel) { }
