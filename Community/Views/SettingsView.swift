@@ -10,7 +10,7 @@ enum SettingsDestination: Hashable {
 }
 
 struct SettingsView: View {
-  @Environment(\.dismiss) var dismiss
+  @Environment(\.dismiss) private var dismiss
   @State private var destination: SettingsDestination?
   @AppStorage("isShowingLoginScreen") private var isShowingLoginScreen: Bool = false
   
@@ -88,8 +88,4 @@ struct SettingsView: View {
       }
     }
   }
-}
-
-#Preview {
-  SettingsView()
 }

@@ -1,5 +1,4 @@
 import Foundation
-import PhotosUI
 import SwiftUI
 import Combine
 
@@ -10,9 +9,6 @@ class ProfileViewModel: ObservableObject {
   @Published private(set) var currentPoints: Int = 0
   @Published private(set) var pointsHistory: [PointsTransaction] = []
   @Published private(set) var isUploadingImage = false
-  @Published var selectedPhoto: PhotosPickerItem? {
-    didSet { Task { await uploadImage() } }
-  }
 
   private let userManager: FirestoreManager<UserModel>
   private let pointsManager: PointsManagerProtocol
@@ -57,23 +53,21 @@ class ProfileViewModel: ObservableObject {
     try await userManager.updateDocument(id: user.id, data: userData)
   }
 
-  private func uploadImage() async {
+  @MainActor
+  func uploadProfileImage(_ imageData: Data) async {
     isUploadingImage = true
     defer { isUploadingImage = false }
 
     do {
-      guard let item = selectedPhoto,
-            let data = try await item.loadTransferable(type: Data.self) else { return }
-
-      let compressedData = storageManager.compressImageData(data, maxSizeKB: 500)
+      let compressedData = storageManager.compressImageData(imageData, maxSizeKB: 500)
       let path = storageManager.generateImagePath(for: "profile_images")
-      let imageUrl = try await storageManager.uploadData(compressedData, path: path)
-
+      
       // If there's an existing profile image, delete it
       if let oldImagePath = user.profileImageUrl {
         try? await storageManager.deleteFile(at: oldImagePath)
       }
 
+      let imageUrl = try await storageManager.uploadData(compressedData, path: path)
       user = user.withProfileImageUrl(imageUrl)
       try await updateUser()
     } catch {

@@ -28,20 +28,20 @@ struct EventCardView: View {
     VStack(alignment: .leading, spacing: 0) {
       HStack {
         if let creator = viewModel.event.creator, let imageUrl = creator.profileImageUrl {
-          AsyncImage(url: URL(string: imageUrl)) { image in
+          CachedAsyncImage(url: imageUrl) { image in
             image
               .resizable()
               .scaledToFill()
               .frame(width: 40, height: 40)
               .clipShape(Circle())
-              .overlay(Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1))
+              .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: Spacing.halfPointSmall))
           } placeholder: {
             ProgressView()
               .frame(width: 40, height: 40)
           }
         } else {
           Circle()
-            .fill(Color.gray.opacity(0.2))
+            .fill(Color.gray.opacity(0.3))
             .frame(width: 40, height: 40)
             .overlay(
               Image(systemName: "person.crop.circle.fill")
@@ -87,20 +87,22 @@ struct EventCardView: View {
         .padding(.horizontal)
 
       if let imageUrl = viewModel.event.imageUrl {
-        AsyncImage(url: URL(string: imageUrl)) { image in
+        CachedAsyncImage(url: imageUrl) { image in
           image
             .resizable()
             .scaledToFill()
             .frame(maxWidth: .infinity)
-            .frame(height: 250)
+            .frame(height: 300)
             .clipped()
             .opacity(viewModel.event.hasEnded ? 0.6 : 1.0)
         } placeholder: {
-          defaultEventBackground
+          ProgressView()
+            .frame(maxWidth: .infinity)
+            .frame(height: 300)
         }
       } else {
         defaultEventBackground
-          .frame(height: 250)
+          .frame(height: 300)
       }
 
       Divider()
