@@ -11,7 +11,7 @@ struct EventModel: Identifiable {
   let createdAt: Date
   let price: Int
   var participants: [String]
-  
+
   init(
     id: String = UUID().uuidString,
     userId: String,
@@ -50,7 +50,7 @@ extension EventModel: FirestoreConvertible {
       createdAt: (dict["createdAt"] as? Timestamp)?.dateValue() ?? Date()
     )
   }
-  
+
   func toFirestore() -> [String: Any] {
     [
       "id": id,
@@ -63,5 +63,27 @@ extension EventModel: FirestoreConvertible {
       "participants": participants,
       "createdAt": Timestamp(date: createdAt)
     ]
+  }
+}
+
+extension EventModel {
+  var formattedDate: String {
+    DateFormatter.eventTime.string(from: date)
+  }
+
+  var formattedParticipants: String {
+    "\(participants.count) participants"
+  }
+
+  func canJoin(userId: String) -> Bool {
+    !participants.contains(userId) && userId != self.userId
+  }
+
+  func isCreator(userId: String) -> Bool {
+    self.userId == userId
+  }
+
+  func isParticipating(userId: String) -> Bool {
+    participants.contains(userId)
   }
 }

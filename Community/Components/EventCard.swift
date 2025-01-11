@@ -1,14 +1,20 @@
 import SwiftUI
 
+private enum PresentationItem: Identifiable {
+  case participants
+  case quiz
+
+  var id: Self { self }
+}
+
 struct EventCard: View {
   let event: EventModel
   let currentUserId: String
   let onJoin: () -> Void
   @EnvironmentObject private var pointsManager: PointsManager
+  @State private var presentationItem: PresentationItem?
   @State private var showingPaymentAlert = false
   @State private var showingErrorAlert = false
-  @State private var showingParticipants = false
-  @State private var showingQuiz = false
   @State private var errorMessage = ""
 
   var body: some View {
@@ -38,7 +44,7 @@ struct EventCard: View {
       HStack {
         if event.isCreator(userId: currentUserId) {
           Button {
-            showingParticipants = true
+            presentationItem = .participants
           } label: {
             Label(event.formattedParticipants, systemImage: "person.2.fill")
               .font(.subheadline)
@@ -66,7 +72,9 @@ struct EventCard: View {
               .background(Color.green.opacity(0.2))
               .cornerRadius(20)
           } else {
-            Button(action: { showingQuiz = true }) {
+            Button {
+              presentationItem = .quiz
+            } label: {
               Text("\(event.price) Points")
                 .font(.headline)
                 .foregroundColor(.white)
@@ -91,14 +99,16 @@ struct EventCard: View {
     .background(Color(.systemBackground))
     .cornerRadius(Spacing.medium)
     .shadow(radius: 2)
-    .sheet(isPresented: $showingParticipants) {
-      ParticipantsView(viewModel: ParticipantsViewModel(eventId: event.id))
-        .presentationDetents([.medium])
-    }
-    .sheet(isPresented: $showingQuiz) {
-      QuizView(eventId: event.id) { success in
-        if success {
-          showingPaymentAlert = true
+    .sheet(item: $presentationItem) { item in
+      switch item {
+      case .participants:
+        ParticipantsView(viewModel: ParticipantsViewModel(eventId: event.id))
+          .presentationDetents([.medium])
+      case .quiz:
+        QuizView(eventId: event.id) { success in
+          if success {
+            showingPaymentAlert = true
+          }
         }
       }
     }

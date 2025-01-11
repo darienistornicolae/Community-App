@@ -10,7 +10,7 @@ struct QuizModel: Identifiable {
   let createdAt: Date
   var participants: [String]
   let points: Int
-  
+
   init(
     id: String = UUID().uuidString,
     userId: String,
@@ -46,7 +46,7 @@ extension QuizModel: FirestoreConvertible {
       createdAt: (dict["createdAt"] as? Timestamp)?.dateValue() ?? Date()
     )
   }
-  
+
   func toFirestore() -> [String: Any] {
     [
       "id": id,
