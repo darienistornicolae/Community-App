@@ -7,31 +7,21 @@ private enum PresentationItem: Identifiable {
   var id: Self { self }
 }
 
-struct EventCard: View {
+struct EventCardView: View {
   @StateObject private var viewModel: EventViewModel
-  let currentUserId: String
-  let onJoin: () -> Void
   @EnvironmentObject private var pointsManager: PointsManager
   @State private var presentationItem: PresentationItem?
   @State private var showingPaymentAlert = false
   @State private var showingErrorAlert = false
   @State private var errorMessage = ""
   @State private var isLiked = false
+  let currentUserId: String
+  let onJoin: () -> Void
 
   init(event: EventModel, currentUserId: String, onJoin: @escaping () -> Void) {
     self._viewModel = StateObject(wrappedValue: EventViewModel(event: event))
     self.currentUserId = currentUserId
     self.onJoin = onJoin
-  }
-
-  private var shareMessage: String {
-    """
-    Join me at \(viewModel.event.title)!
-    📍 \(viewModel.event.location)
-    📅 \(viewModel.event.formattedDate)
-    
-    \(viewModel.event.description)
-    """
   }
 
   var body: some View {
@@ -60,7 +50,7 @@ struct EventCard: View {
                 .foregroundColor(.gray)
             )
         }
-        
+
         VStack(alignment: .leading, spacing: 2) {
           Text(viewModel.event.creator?.name ?? viewModel.event.userId)
             .font(.headline)
@@ -69,14 +59,14 @@ struct EventCard: View {
             .foregroundColor(.gray)
         }
         .padding(.leading, Spacing.small)
-        
+
         Spacer()
-        
+
         Menu {
           ShareLink(item: shareMessage) {
             Label("Share Event", systemImage: "square.and.arrow.up")
           }
-          
+
           if viewModel.event.isCreator(userId: currentUserId) {
             Button {
               presentationItem = .participants
@@ -87,12 +77,12 @@ struct EventCard: View {
         } label: {
           Image(systemName: "ellipsis")
             .foregroundColor(.primary)
-            .padding(8)
+            .padding(Spacing.small)
         }
       }
       .padding(.horizontal)
       .padding(.vertical, Spacing.small)
-      
+
       Divider()
         .padding(.horizontal)
 
@@ -112,7 +102,7 @@ struct EventCard: View {
         defaultEventBackground
           .frame(height: 250)
       }
-      
+
       Divider()
         .padding(.horizontal)
 
@@ -129,7 +119,7 @@ struct EventCard: View {
         }
         .disabled(viewModel.event.hasEnded)
         .opacity(viewModel.event.hasEnded ? 0.6 : 1.0)
-        
+
         Button {
           // Display the comments section. Probably in a future PR
         } label: {
@@ -145,73 +135,13 @@ struct EventCard: View {
             .foregroundColor(.primary)
         }
         .opacity(viewModel.event.hasEnded ? 0.6 : 1.0)
-        
+
         Spacer()
-        
-        if !viewModel.event.isCreator(userId: currentUserId) {
-          if viewModel.event.isParticipating(userId: currentUserId) {
-            if viewModel.event.hasEnded {
-              Label("Event Ended", systemImage: "clock.fill")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.gray.opacity(0.2))
-                .clipShape(Capsule())
-            } else {
-              Label("Joined", systemImage: "checkmark.circle.fill")
-                .font(.subheadline)
-                .foregroundColor(.green)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.green.opacity(0.2))
-                .clipShape(Capsule())
-            }
-          } else {
-            if viewModel.event.hasEnded {
-              Label("Event Ended", systemImage: "clock.fill")
-                .font(.subheadline)
-                .foregroundColor(.gray)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.gray.opacity(0.2))
-                .clipShape(Capsule())
-            } else {
-              Button {
-                presentationItem = .quiz
-              } label: {
-                Label("\(viewModel.event.price) Points", systemImage: "ticket.fill")
-                  .font(.subheadline)
-                  .foregroundColor(.white)
-                  .padding(.horizontal, 12)
-                  .padding(.vertical, 6)
-                  .background(Color.blue)
-                  .clipShape(Capsule())
-              }
-            }
-          }
-        } else {
-          if viewModel.event.hasEnded {
-            Label("Event Ended", systemImage: "clock.fill")
-              .font(.subheadline)
-              .foregroundColor(.gray)
-              .padding(.horizontal, 12)
-              .padding(.vertical, 6)
-              .background(Color.gray.opacity(0.2))
-              .clipShape(Capsule())
-          } else {
-            Label("Your Event", systemImage: "star.fill")
-              .font(.subheadline)
-              .foregroundColor(.orange)
-              .padding(.horizontal, 12)
-              .padding(.vertical, 6)
-              .background(Color.orange.opacity(0.2))
-              .clipShape(Capsule())
-          }
-        }
+
+        eventStatusView
       }
       .padding()
-      
+
       Divider()
         .padding(.horizontal)
 
@@ -219,24 +149,24 @@ struct EventCard: View {
         Text(viewModel.event.formattedParticipants)
           .font(.subheadline)
           .bold()
-        
+
         Text(viewModel.event.description)
           .font(.subheadline)
           .lineLimit(3)
-        
+
         Text(viewModel.event.formattedDate)
           .font(.caption)
           .foregroundColor(.gray)
-          .padding(.top, 4)
+          .padding(.top, Spacing.extraSmall)
       }
       .padding(.horizontal)
       .padding(.bottom)
     }
     .background(Color(.systemBackground))
-    .clipShape(RoundedRectangle(cornerRadius: 12))
+    .clipShape(RoundedRectangle(cornerRadius: Spacing.small))
     .overlay(
-      RoundedRectangle(cornerRadius: 12)
-        .stroke(Color.gray.opacity(0.1), lineWidth: 1)
+      RoundedRectangle(cornerRadius: Spacing.small)
+        .stroke(Color.gray.opacity(0.1), lineWidth: Spacing.halfPointSmall)
     )
     .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
     .sheet(item: $presentationItem) { item in
@@ -268,8 +198,11 @@ struct EventCard: View {
       Text(errorMessage)
     }
   }
+}
 
-  private func joinEvent() async {
+// MARK: Private
+private extension EventCardView {
+  func joinEvent() async {
     do {
       try await pointsManager.spendPoints(
         from: currentUserId,
@@ -288,9 +221,29 @@ struct EventCard: View {
     }
   }
 
-  private var defaultEventBackground: some View {
+  var shareMessage: String {
+    """
+    Join me at \(viewModel.event.title)!
+    📍 \(viewModel.event.location)
+    📅 \(viewModel.event.formattedDate)
+    
+    \(viewModel.event.description)
+    """
+  }
+
+  var eventStatusView: some View {
+    let status = viewModel.status
+    return EventStatusLabel(
+      title: status.title,
+      icon: status.icon,
+      color: status.color,
+      action: status.isJoinable ? { presentationItem = .quiz } : nil
+    )
+  }
+
+  var defaultEventBackground: some View {
     LinearGradient(
-      colors: viewModel.event.hasEnded ? 
+      colors: viewModel.event.hasEnded ?
         [Color.gray.opacity(0.7), Color.gray.opacity(0.7)] :
         [.blue.opacity(0.7), .purple.opacity(0.7)],
       startPoint: .topLeading,
@@ -312,8 +265,8 @@ struct EventCard: View {
           Text("Event Ended")
             .font(.headline)
             .foregroundColor(.white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.horizontal, Spacing.default)
+            .padding(.vertical, Spacing.small)
             .background(Color.black.opacity(0.6))
             .clipShape(Capsule())
         }

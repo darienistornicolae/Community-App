@@ -56,7 +56,6 @@ class FirebaseStorageManager: FirebaseImageStoarageProtocol {
         compressedData = newData
       }
     }
-
     return compressedData
   }
 } 
