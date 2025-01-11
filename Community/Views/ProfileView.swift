@@ -9,10 +9,41 @@ struct ProfileView: View {
       List {
         Section {
           HStack {
-            let profileImage = viewModel.user.profileImage
             PhotosPicker(selection: $viewModel.selectedPhoto, matching: .images) {
-              ProfileImageView(image: profileImage)
+              if let imageUrl = viewModel.user.profileImageUrl {
+                AsyncImage(url: URL(string: imageUrl)) { image in
+                  image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 80, height: 80)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(Color.gray.opacity(0.2), lineWidth: 1))
+                } placeholder: {
+                  ProgressView()
+                    .frame(width: 80, height: 80)
+                }
+              } else {
+                Circle()
+                  .fill(Color.gray.opacity(0.2))
+                  .frame(width: 80, height: 80)
+                  .overlay(
+                    Image(systemName: "person.crop.circle.fill")
+                      .resizable()
+                      .padding(15)
+                      .foregroundColor(.gray)
+                  )
+              }
             }
+            .overlay(
+              Group {
+                if viewModel.isUploadingImage {
+                  ProgressView()
+                    .frame(width: 80, height: 80)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Circle())
+                }
+              }
+            )
 
             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
               Text(viewModel.user.name)

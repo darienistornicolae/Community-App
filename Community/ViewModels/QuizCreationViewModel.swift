@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import PhotosUI
 
 @MainActor
 class QuizCreationViewModel: ObservableObject {
@@ -10,30 +11,54 @@ class QuizCreationViewModel: ObservableObject {
   @Published var errorMessage: String?
   @Published var showError: Bool = false
   @Published var selectedAchievement: Asset?
+  @Published var imageUrl: String?
   @Published private(set) var availableAchievements: [Asset] = []
-  
+  @Published private(set) var isUploadingImage = false
+
   private let quizManager: FirestoreManager<QuizModel>
   private let achievementsManager: FirestoreManager<CountryAchievementModel>
-  
+  private let storageManager: FirebaseImageStoarageProtocol
+
   var isValid: Bool {
     !question.isEmpty &&
     answers.allSatisfy { !$0.isEmpty } &&
     correctAnswerIndex >= 0 &&
-    correctAnswerIndex < answers.count
+    correctAnswerIndex < answers.count &&
+    !isUploadingImage
   }
-  
-  init() {
+
+  init(storageManager: FirebaseImageStoarageProtocol = FirebaseStorageManager()) {
     self.quizManager = FirestoreManager(collection: "quizzes")
     self.achievementsManager = FirestoreManager(collection: "achievements")
-    
+    self.storageManager = storageManager
+
     Task {
       await loadAvailableAchievements()
     }
   }
-  
+
+  func uploadImage(_ item: PhotosPickerItem) async {
+    isUploadingImage = true
+    defer { isUploadingImage = false }
+
+    do {
+      guard let data = try await item.loadTransferable(type: Data.self) else {
+        throw NSError(domain: "", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to load image data"])
+      }
+
+      let compressedData = storageManager.compressImageData(data, maxSizeKB: 500)
+      let path = storageManager.generateImagePath(for: "quiz_images")
+      imageUrl = try await storageManager.uploadData(compressedData, path: path)
+    } catch {
+      errorMessage = "Failed to upload image: \(error.localizedDescription)"
+      showError = true
+      print("Error uploading image: \(error)")
+    }
+  }
+
   func createQuiz() async {
     do {
-      let quiz = QuizModel(
+      var quiz = QuizModel(
         userId: UserId.current.rawValue,
         question: question,
         answers: answers,
@@ -41,7 +66,11 @@ class QuizCreationViewModel: ObservableObject {
         points: points,
         achievementId: selectedAchievement?.rawValue
       )
-      
+
+      if let imageUrl = imageUrl {
+        quiz = quiz.withImageUrl(imageUrl)
+      }
+
       try await quizManager.createDocument(id: quiz.id, data: quiz.toFirestore())
     } catch {
       errorMessage = "Failed to create quiz: \(error.localizedDescription)"
@@ -49,7 +78,7 @@ class QuizCreationViewModel: ObservableObject {
       print("Error creating quiz: \(error)")
     }
   }
-  
+
   private func loadAvailableAchievements() async {
     do {
       let achievements = try await achievementsManager.fetch()

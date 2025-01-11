@@ -23,8 +23,14 @@ struct FloatingActionButton: View {
       switch item {
       case .quizCreation:
         QuizCreationView()
+          .onDisappear {
+            isExpanded = false
+          }
       case .eventCreation:
         EventCreationView()
+          .onDisappear {
+            isExpanded = false
+          }
       }
     }
   }
@@ -56,6 +62,9 @@ private extension FloatingActionButton {
 
   var quizCreationButton: some View {
     Button {
+      withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+        isExpanded = false
+      }
       presentationView = .quizCreation
     } label: {
       Image(systemName: "questionmark.circle.fill")
@@ -73,6 +82,9 @@ private extension FloatingActionButton {
 
   var eventCreationButton: some View {
     Button {
+      withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+        isExpanded = false
+      }
       presentationView = .eventCreation
     } label: {
       Image(systemName: "square.and.pencil")

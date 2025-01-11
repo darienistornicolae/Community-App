@@ -10,7 +10,9 @@ struct EventModel: Identifiable {
   let date: Date
   let createdAt: Date
   let price: Int
+  let imageUrl: String?
   var participants: [String]
+  var creator: UserModel?
 
   init(
     id: String = UUID().uuidString,
@@ -20,8 +22,10 @@ struct EventModel: Identifiable {
     location: String,
     date: Date,
     price: Int,
+    imageUrl: String? = nil,
     participants: [String] = [],
-    createdAt: Date = Date()
+    createdAt: Date = Date(),
+    creator: UserModel? = nil
   ) {
     self.id = id
     self.userId = userId
@@ -30,15 +34,19 @@ struct EventModel: Identifiable {
     self.location = location
     self.date = date
     self.price = price
+    self.imageUrl = imageUrl
     self.participants = participants
     self.createdAt = createdAt
+    self.creator = creator
   }
 }
 
 // MARK: - Firestore Convertible
 extension EventModel: FirestoreConvertible {
   static func fromFirestore(_ dict: [String: Any]) -> EventModel {
-    EventModel(
+    let creator = (dict["creator"] as? [String: Any]).map { UserModel.fromFirestore($0) }
+    
+    return EventModel(
       id: dict["id"] as? String ?? "",
       userId: dict["userId"] as? String ?? "",
       title: dict["title"] as? String ?? "",
@@ -46,13 +54,15 @@ extension EventModel: FirestoreConvertible {
       location: dict["location"] as? String ?? "",
       date: (dict["date"] as? Timestamp)?.dateValue() ?? Date(),
       price: dict["price"] as? Int ?? 0,
+      imageUrl: dict["imageUrl"] as? String,
       participants: dict["participants"] as? [String] ?? [],
-      createdAt: (dict["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+      createdAt: (dict["createdAt"] as? Timestamp)?.dateValue() ?? Date(),
+      creator: creator
     )
   }
 
   func toFirestore() -> [String: Any] {
-    [
+    var dict: [String: Any] = [
       "id": id,
       "userId": userId,
       "title": title,
@@ -63,6 +73,16 @@ extension EventModel: FirestoreConvertible {
       "participants": participants,
       "createdAt": Timestamp(date: createdAt)
     ]
+    
+    if let imageUrl = imageUrl {
+      dict["imageUrl"] = imageUrl
+    }
+    
+    if let creator = creator {
+      dict["creator"] = creator.toFirestore()
+    }
+    
+    return dict
   }
 }
 
@@ -75,8 +95,12 @@ extension EventModel {
     "\(participants.count) participants"
   }
 
+  var hasEnded: Bool {
+    date < Date()
+  }
+
   func canJoin(userId: String) -> Bool {
-    !participants.contains(userId) && userId != self.userId
+    !hasEnded && !participants.contains(userId) && userId != self.userId
   }
 
   func isCreator(userId: String) -> Bool {
@@ -85,5 +109,22 @@ extension EventModel {
 
   func isParticipating(userId: String) -> Bool {
     participants.contains(userId)
+  }
+  
+  // Helper method to create a new event with an updated image URL
+  func withImageUrl(_ imageUrl: String?) -> EventModel {
+    EventModel(
+      id: id,
+      userId: userId,
+      title: title,
+      description: description,
+      location: location,
+      date: date,
+      price: price,
+      imageUrl: imageUrl,
+      participants: participants,
+      createdAt: createdAt,
+      creator: creator
+    )
   }
 }
