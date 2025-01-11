@@ -1,9 +1,26 @@
 import SwiftUI
 import PhotosUI
 
+private enum PresentationItem: Identifiable {
+  case imageEdit
+  case pointsHistory([PointsTransaction])
+  case settings
+  
+  var id: String {
+    switch self {
+    case .imageEdit:
+      return "imageEdit"
+    case .pointsHistory:
+      return "pointsHistory"
+    case .settings:
+      return "settings"
+    }
+  }
+}
+
 struct ProfileView: View {
   @StateObject private var viewModel = ProfileViewModel()
-  @State private var showingImageEdit = false
+  @State private var presentationItem: PresentationItem?
   
   var body: some View {
     NavigationStack {
@@ -20,11 +37,24 @@ struct ProfileView: View {
           settingsButton
         }
       }
-      .fullScreenCover(isPresented: $viewModel.showingSettings) {
-        SettingsView()
-      }
-      .sheet(isPresented: $showingImageEdit) {
-        ProfileImageEditView(viewModel: viewModel)
+      .fullScreenCover(item: $presentationItem) { item in
+        switch item {
+        case .imageEdit:
+          ProfileImageEditView(viewModel: viewModel)
+        case .pointsHistory(let transactions):
+          NavigationStack {
+            PointsTransactionView(transactions: transactions)
+              .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                  Button("Done") {
+                    presentationItem = nil
+                  }
+                }
+              }
+          }
+        case .settings:
+          SettingsView()
+        }
       }
     }
   }
@@ -45,7 +75,7 @@ private extension ProfileView {
 
   var profileImageButton: some View {
     Button {
-      showingImageEdit = true
+      presentationItem = .imageEdit
     } label: {
       Group {
         if let imageUrl = viewModel.user.profileImageUrl {
@@ -106,8 +136,8 @@ private extension ProfileView {
       }
 
       if !viewModel.pointsHistory.isEmpty {
-        NavigationLink {
-          PointsTransactionView(transactions: viewModel.pointsHistory)
+        Button {
+          presentationItem = .pointsHistory(viewModel.pointsHistory)
         } label: {
           HStack {
             Image(systemName: "clock.arrow.circlepath")
@@ -146,7 +176,7 @@ private extension ProfileView {
 
   var settingsButton: some View {
     Button {
-      viewModel.showingSettings = true
+      presentationItem = .settings
     } label: {
       Image(systemName: "gear")
     }
