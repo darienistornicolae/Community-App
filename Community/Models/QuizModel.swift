@@ -10,7 +10,8 @@ struct QuizModel: Identifiable {
   let createdAt: Date
   var participants: [String]
   let points: Int
-
+  let achievementId: String?
+  
   init(
     id: String = UUID().uuidString,
     userId: String,
@@ -19,6 +20,7 @@ struct QuizModel: Identifiable {
     correctAnswerIndex: Int,
     points: Int = 10,
     participants: [String] = [],
+    achievementId: String? = nil,
     createdAt: Date = Date()
   ) {
     self.id = id
@@ -28,6 +30,7 @@ struct QuizModel: Identifiable {
     self.correctAnswerIndex = correctAnswerIndex
     self.points = points
     self.participants = participants
+    self.achievementId = achievementId
     self.createdAt = createdAt
   }
 }
@@ -43,12 +46,13 @@ extension QuizModel: FirestoreConvertible {
       correctAnswerIndex: dict["correctAnswerIndex"] as? Int ?? 0,
       points: dict["points"] as? Int ?? 10,
       participants: dict["participants"] as? [String] ?? [],
+      achievementId: dict["achievementId"] as? String,
       createdAt: (dict["createdAt"] as? Timestamp)?.dateValue() ?? Date()
     )
   }
-
+  
   func toFirestore() -> [String: Any] {
-    [
+    var data: [String: Any] = [
       "id": id,
       "userId": userId,
       "question": question,
@@ -58,5 +62,11 @@ extension QuizModel: FirestoreConvertible {
       "participants": participants,
       "createdAt": Timestamp(date: createdAt)
     ]
+    
+    if let achievementId = achievementId {
+      data["achievementId"] = achievementId
+    }
+    
+    return data
   }
 }

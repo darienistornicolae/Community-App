@@ -9,8 +9,11 @@ class QuizCreationViewModel: ObservableObject {
   @Published var points: Int = 10
   @Published var errorMessage: String?
   @Published var showError: Bool = false
+  @Published var selectedAchievement: Asset?
+  @Published private(set) var availableAchievements: [Asset] = []
   
   private let quizManager: FirestoreManager<QuizModel>
+  private let achievementsManager: FirestoreManager<CountryAchievementModel>
   
   var isValid: Bool {
     !question.isEmpty &&
@@ -21,6 +24,11 @@ class QuizCreationViewModel: ObservableObject {
   
   init() {
     self.quizManager = FirestoreManager(collection: "quizzes")
+    self.achievementsManager = FirestoreManager(collection: "achievements")
+    
+    Task {
+      await loadAvailableAchievements()
+    }
   }
   
   func createQuiz() async {
@@ -30,7 +38,8 @@ class QuizCreationViewModel: ObservableObject {
         question: question,
         answers: answers,
         correctAnswerIndex: correctAnswerIndex,
-        points: points
+        points: points,
+        achievementId: selectedAchievement?.rawValue
       )
       
       try await quizManager.createDocument(id: quiz.id, data: quiz.toFirestore())
@@ -38,6 +47,17 @@ class QuizCreationViewModel: ObservableObject {
       errorMessage = "Failed to create quiz: \(error.localizedDescription)"
       showError = true
       print("Error creating quiz: \(error)")
+    }
+  }
+  
+  private func loadAvailableAchievements() async {
+    do {
+      let achievements = try await achievementsManager.fetch()
+      let unlockedAchievements = achievements.filter { $0.isUnlockedBy(userId: UserId.current.rawValue) }
+      let unlockedCountries = Set(unlockedAchievements.map { $0.country })
+      availableAchievements = Asset.allCases.filter { !unlockedCountries.contains($0) }
+    } catch {
+      print("Error loading achievements: \(error)")
     }
   }
 }
