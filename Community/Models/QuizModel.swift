@@ -11,6 +11,7 @@ struct QuizModel: Identifiable {
   var participants: [String]
   let points: Int
   let achievementId: String?
+  let imageUrl: String?
   
   init(
     id: String = UUID().uuidString,
@@ -21,6 +22,7 @@ struct QuizModel: Identifiable {
     points: Int = 10,
     participants: [String] = [],
     achievementId: String? = nil,
+    imageUrl: String? = nil,
     createdAt: Date = Date()
   ) {
     self.id = id
@@ -31,6 +33,7 @@ struct QuizModel: Identifiable {
     self.points = points
     self.participants = participants
     self.achievementId = achievementId
+    self.imageUrl = imageUrl
     self.createdAt = createdAt
   }
 }
@@ -47,6 +50,7 @@ extension QuizModel: FirestoreConvertible {
       points: dict["points"] as? Int ?? 10,
       participants: dict["participants"] as? [String] ?? [],
       achievementId: dict["achievementId"] as? String,
+      imageUrl: dict["imageUrl"] as? String,
       createdAt: (dict["createdAt"] as? Timestamp)?.dateValue() ?? Date()
     )
   }
@@ -67,6 +71,28 @@ extension QuizModel: FirestoreConvertible {
       data["achievementId"] = achievementId
     }
     
+    if let imageUrl = imageUrl {
+      data["imageUrl"] = imageUrl
+    }
+    
     return data
+  }
+}
+
+extension QuizModel {
+  // Helper method to create a new quiz with an updated image URL
+  func withImageUrl(_ imageUrl: String?) -> QuizModel {
+    QuizModel(
+      id: id,
+      userId: userId,
+      question: question,
+      answers: answers,
+      correctAnswerIndex: correctAnswerIndex,
+      points: points,
+      participants: participants,
+      achievementId: achievementId,
+      imageUrl: imageUrl,
+      createdAt: createdAt
+    )
   }
 }

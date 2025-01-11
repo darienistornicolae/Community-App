@@ -26,6 +26,24 @@ struct QuizView: View {
                 .bold()
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
+              
+              if let imageUrl = quiz.imageUrl {
+                AsyncImage(url: URL(string: imageUrl)) { image in
+                  image
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 200)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                } placeholder: {
+                  RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.gray.opacity(0.1))
+                    .frame(height: 200)
+                    .overlay(
+                      ProgressView()
+                    )
+                }
+                .padding(.horizontal)
+              }
             }
             .padding(.top)
             
