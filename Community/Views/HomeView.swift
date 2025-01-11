@@ -10,7 +10,7 @@ struct HomeView: View {
           VStack(spacing: Spacing.large) {
             LazyVStack(spacing: Spacing.default) {
               ForEach(viewModel.events) { event in
-                EventCard(
+                EventCardView(
                   event: event,
                   currentUserId: viewModel.currentUserId,
                   onJoin: {
@@ -48,7 +48,7 @@ private extension HomeView {
         Spacer()
         FloatingActionButton()
       }
-      .padding(.bottom, Spacing.extraLarge)
+      .padding(.bottom, Spacing.default)
     }
   }
 }

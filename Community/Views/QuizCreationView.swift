@@ -62,7 +62,7 @@ private extension QuizCreationView {
         .textInputAutocapitalization(.sentences)
     }
   }
-  
+
   var imageSection: some View {
     Section("Image (Optional)") {
       if let imageUrl = viewModel.imageUrl {
@@ -80,7 +80,7 @@ private extension QuizCreationView {
               ProgressView()
             )
         }
-        
+
         Button("Remove Image", role: .destructive) {
           viewModel.imageUrl = nil
         }
@@ -101,20 +101,20 @@ private extension QuizCreationView {
             .onTapGesture {
               viewModel.correctAnswerIndex = index
             }
-          
+
           TextField("Answer \(index + 1)", text: $viewModel.answers[index])
             .textInputAutocapitalization(.sentences)
         }
       }
     }
   }
-  
+
   var pointsSection: some View {
     Section {
       Stepper("Points: \(viewModel.points)", value: $viewModel.points, in: 5...50, step: 5)
     }
   }
-  
+
   var achievementSection: some View {
     Section("Achievement Reward (Optional)") {
       if let selected = viewModel.selectedAchievement {
@@ -124,7 +124,7 @@ private extension QuizCreationView {
       }
     }
   }
-  
+
   func selectedAchievementView(_ achievement: Asset) -> some View {
     VStack {
       HStack {
@@ -148,7 +148,7 @@ private extension QuizCreationView {
       }
     }
   }
-  
+
   var availableAchievementsView: some View {
     ScrollView(.horizontal, showsIndicators: false) {
       HStack(spacing: Spacing.medium) {
@@ -159,7 +159,7 @@ private extension QuizCreationView {
       .padding(.horizontal, Spacing.small)
     }
   }
-  
+
   func achievementCell(_ achievement: Asset) -> some View {
     VStack {
       Image(achievement.rawValue)
