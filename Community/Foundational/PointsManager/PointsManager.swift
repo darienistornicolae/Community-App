@@ -1,6 +1,23 @@
 import Foundation
 import FirebaseFirestore
 
+protocol UserServiceProtocol {
+  func getUser(id: String) async throws -> UserModel
+  func updateUser(id: String, data: [String: Any]) async throws
+}
+
+struct UserService: UserServiceProtocol {
+  private let userManager = FirestoreManager<UserModel>(collection: "users")
+  
+  func getUser(id: String) async throws -> UserModel {
+    try await userManager.getDocument(id: id)
+  }
+  
+  func updateUser(id: String, data: [String: Any]) async throws {
+    try await userManager.updateDocument(id: id, data: data)
+  }
+}
+
 protocol PointsManagerProtocol {
   var currentPoints: Int { get }
 
@@ -18,10 +35,10 @@ class PointsManager: @preconcurrency PointsManagerProtocol, ObservableObject {
   static let initialPoints = 50
 
   @Published private(set) var currentPoints: Int = 0
-  private let userManager: FirestoreManager<UserModel>
+  private let userService: UserServiceProtocol
 
-  private init() {
-    self.userManager = FirestoreManager(collection: "users")
+  private init(userService: UserServiceProtocol = UserService()) {
+    self.userService = userService
   }
 
   func refreshPoints(for userId: String) async {
@@ -46,12 +63,12 @@ class PointsManager: @preconcurrency PointsManagerProtocol, ObservableObject {
       "pointsHistory": [transaction.toFirestore()]
     ]
 
-    try await userManager.updateDocument(id: userId, data: updateData)
+    try await userService.updateUser(id: userId, data: updateData)
     await refreshPoints(for: userId)
   }
 
   func getCurrentBalance(for userId: String) async throws -> Int {
-    let user = try await userManager.getDocument(id: userId)
+    let user = try await userService.getUser(id: userId)
     return user.points
   }
 
@@ -61,7 +78,7 @@ class PointsManager: @preconcurrency PointsManagerProtocol, ObservableObject {
     type: PointsTransactionType,
     description: String
   ) async throws {
-    let user = try await userManager.getDocument(id: userId)
+    let user = try await userService.getUser(id: userId)
     let newPoints = user.points + amount
 
     let transaction = PointsTransaction(
@@ -80,7 +97,7 @@ class PointsManager: @preconcurrency PointsManagerProtocol, ObservableObject {
       "pointsHistory": newHistory.map { $0.toFirestore() }
     ]
 
-    try await userManager.updateDocument(id: userId, data: updateData)
+    try await userService.updateUser(id: userId, data: updateData)
     await refreshPoints(for: userId)
   }
 
@@ -90,7 +107,7 @@ class PointsManager: @preconcurrency PointsManagerProtocol, ObservableObject {
     type: PointsTransactionType,
     description: String
   ) async throws {
-    let user = try await userManager.getDocument(id: userId)
+    let user = try await userService.getUser(id: userId)
     guard user.points >= amount else {
       throw PointsError.insufficientPoints
     }
@@ -113,12 +130,12 @@ class PointsManager: @preconcurrency PointsManagerProtocol, ObservableObject {
       "pointsHistory": newHistory.map { $0.toFirestore() }
     ]
 
-    try await userManager.updateDocument(id: userId, data: updateData)
+    try await userService.updateUser(id: userId, data: updateData)
     await refreshPoints(for: userId)
   }
 
   func getTransactionHistory(for userId: String) async throws -> [PointsTransaction] {
-    let user = try await userManager.getDocument(id: userId)
+    let user = try await userService.getUser(id: userId)
     return user.pointsHistory.sorted { $0.timestamp > $1.timestamp }
   }
 }
