@@ -101,7 +101,6 @@ private extension QuizCreationView {
             .onTapGesture {
               viewModel.correctAnswerIndex = index
             }
-
           TextField("Answer \(index + 1)", text: $viewModel.answers[index])
             .textInputAutocapitalization(.sentences)
         }

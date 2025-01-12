@@ -44,6 +44,7 @@ struct HomeView: View {
     .environmentObject(PointsManager.shared)
 }
 
+// MARK: Private
 private extension HomeView {
   var floatingButton: some View {
     VStack {

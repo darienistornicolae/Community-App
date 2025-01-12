@@ -32,6 +32,7 @@ class CameraPermissionManager: ObservableObject {
   }
 }
 
+// MARK: Private
 private extension CameraPermissionManager {
   func handleAuthorizationStatus(_ status: AVAuthorizationStatus, promptIfNotDetermined: Bool) async {
     switch status {

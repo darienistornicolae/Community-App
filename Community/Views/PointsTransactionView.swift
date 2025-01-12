@@ -2,37 +2,47 @@ import Foundation
 import SwiftUI
 
 struct PointsTransactionView: View {
+  @Environment(\.dismiss) private var dismiss
   let transactions: [PointsTransaction]
 
   var body: some View {
-    List(transactions, id: \.timestamp) { transaction in
-      VStack(alignment: .leading, spacing: Spacing.small) {
-        HStack {
-          Image(systemName: transaction.amount >= 0 ? "plus.circle.fill" : "minus.circle.fill")
-            .foregroundColor(transaction.amount >= 0 ? .green : .red)
-          
-          VStack(alignment: .leading) {
-            Text(transaction.description)
-              .font(.headline)
-            Text(transaction.type.rawValue.capitalized)
-              .font(.caption)
-              .foregroundColor(.gray)
+    NavigationStack {
+      List(transactions, id: \.timestamp) { transaction in
+        VStack(alignment: .leading, spacing: Spacing.small) {
+          HStack {
+            Image(systemName: transaction.amount >= 0 ? "plus.circle.fill" : "minus.circle.fill")
+              .foregroundColor(transaction.amount >= 0 ? .green : .red)
+            
+            VStack(alignment: .leading) {
+              Text(transaction.description)
+                .font(.headline)
+              Text(transaction.type.rawValue.capitalized)
+                .font(.caption)
+                .foregroundColor(.gray)
+            }
+
+            Spacer()
+
+            Text("\(transaction.amount >= 0 ? "+" : "")\(transaction.amount)")
+              .bold()
+              .foregroundColor(transaction.amount >= 0 ? .green : .red)
           }
 
-          Spacer()
-
-          Text("\(transaction.amount >= 0 ? "+" : "")\(transaction.amount)")
-            .bold()
-            .foregroundColor(transaction.amount >= 0 ? .green : .red)
+          Text(DateFormatter.eventTime.string(from: transaction.timestamp))
+            .font(.caption2)
+            .foregroundColor(.gray)
         }
-
-        Text(DateFormatter.eventTime.string(from: transaction.timestamp))
-          .font(.caption2)
-          .foregroundColor(.gray)
+        .padding(.vertical, Spacing.extraSmall)
       }
-      .padding(.vertical, Spacing.extraSmall)
+      .navigationTitle("Points History")
+      .navigationBarTitleDisplayMode(.inline)
+      .toolbar {
+        ToolbarItem(placement: .topBarLeading) {
+          Button("Done") {
+            dismiss()
+          }
+        }
+      }
     }
-    .navigationTitle("Points History")
-    .navigationBarTitleDisplayMode(.inline)
   }
 }

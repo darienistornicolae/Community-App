@@ -5,7 +5,7 @@ struct EventCreationView: View {
   @Environment(\.dismiss) private var dismiss
   @StateObject private var viewModel = EventCreationViewModel()
   @State private var selectedItem: PhotosPickerItem?
-  
+
   var body: some View {
     NavigationStack {
       Form {
@@ -14,7 +14,7 @@ struct EventCreationView: View {
           TextField("Location", text: $viewModel.location)
           DatePicker("Date & Time", selection: $viewModel.date, in: Date()...)
         }
-        
+
         Section("Event Image (Optional)") {
           if let imageUrl = viewModel.imageUrl {
             AsyncImage(url: URL(string: imageUrl)) { image in
@@ -31,7 +31,7 @@ struct EventCreationView: View {
                   ProgressView()
                 )
             }
-            
+
             Button("Remove Image", role: .destructive) {
               viewModel.imageUrl = nil
             }
@@ -59,7 +59,7 @@ struct EventCreationView: View {
             dismiss()
           }
         }
-        
+
         ToolbarItem(placement: .confirmationAction) {
           Button("Create") {
             Task {

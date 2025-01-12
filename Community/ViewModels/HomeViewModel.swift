@@ -75,7 +75,7 @@ private extension HomeViewModel {
       .store(in: &cancellables)
   }
 
-  private func setupEventsListener() {
+  func setupEventsListener() {
     eventsListener = eventManager.listen { [weak self] events in
       self?.events = events.sorted { $0.date > $1.date }
     }
