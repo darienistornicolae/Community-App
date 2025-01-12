@@ -34,59 +34,13 @@ class QuizViewModel: ObservableObject {
   func submitAnswer() {
     guard let selectedAnswerIndex = selectedAnswerIndex,
           let quiz = quiz else { return }
-    
+
     let isCorrect = selectedAnswerIndex == quiz.correctAnswerIndex
     quizResult = isCorrect
 
     if isCorrect {
       Task {
-        do {
-          // Award points
-          try await pointsManager.addPoints(
-            to: UserId.current.rawValue,
-            amount: quiz.points,
-            type: .reward,
-            description: "Correct quiz answer: \(quiz.question)"
-          )
-
-          // Update quiz participants
-          var updatedQuiz = quiz
-          updatedQuiz.participants.append(UserId.current.rawValue)
-          try await quizManager.updateDocument(
-            id: quiz.id,
-            data: updatedQuiz.toFirestore()
-          )
-
-          // Handle achievement if available
-          if let achievementId = quiz.achievementId {
-            // First, update the user's achievements
-            let user = try await userManager.getDocument(id: UserId.current.rawValue)
-            if !user.achievementIds.contains(achievementId) {
-              var updatedUser = user
-              updatedUser.achievementIds.append(achievementId)
-              try await userManager.updateDocument(
-                id: user.id,
-                data: ["achievementIds": updatedUser.achievementIds]
-              )
-              
-              // Then, update the achievement's unlockedBy list
-              let achievement = try await achievementsManager.getDocument(id: achievementId)
-              if !achievement.isUnlockedBy(userId: UserId.current.rawValue) {
-                var updatedAchievement = achievement
-                updatedAchievement.unlockedBy.append(
-                  AchievementUnlockModel(userId: UserId.current.rawValue)
-                )
-                try await achievementsManager.updateDocument(
-                  id: achievementId,
-                  data: updatedAchievement.toFirestore()
-                )
-                unlockedAchievement = achievement.country
-              }
-            }
-          }
-        } catch {
-          print("Error awarding points or achievement: \(error)")
-        }
+        await handleCorrectAnswer(quiz)
       }
     }
   }
@@ -95,5 +49,71 @@ class QuizViewModel: ObservableObject {
     selectedAnswerIndex = nil
     quizResult = nil
     unlockedAchievement = nil
+  }
+}
+
+// MARK: Private
+private extension QuizViewModel {
+  func handleCorrectAnswer(_ quiz: QuizModel) async {
+    do {
+      try await awardPoints(quiz)
+      try await updateQuizParticipants(quiz)
+
+      if let achievementId = quiz.achievementId {
+        try await handleAchievement(achievementId)
+      }
+    } catch {
+      print("Error handling correct answer: \(error)")
+    }
+  }
+
+  func awardPoints(_ quiz: QuizModel) async throws {
+    try await pointsManager.addPoints(
+      to: UserId.current.rawValue,
+      amount: quiz.points,
+      type: .reward,
+      description: "Correct quiz answer: \(quiz.question)"
+    )
+  }
+
+  func updateQuizParticipants(_ quiz: QuizModel) async throws {
+    var updatedQuiz = quiz
+    updatedQuiz.participants.append(UserId.current.rawValue)
+    try await quizManager.updateDocument(
+      id: quiz.id,
+      data: updatedQuiz.toFirestore()
+    )
+  }
+
+  func handleAchievement(_ achievementId: String) async throws {
+    let user = try await userManager.getDocument(id: UserId.current.rawValue)
+    if !user.achievementIds.contains(achievementId) {
+      try await updateUserAchievements(user, achievementId)
+      try await updateAchievementUnlocks(achievementId)
+    }
+  }
+
+  func updateUserAchievements(_ user: UserModel, _ achievementId: String) async throws {
+    var updatedUser = user
+    updatedUser.achievementIds.append(achievementId)
+    try await userManager.updateDocument(
+      id: user.id,
+      data: ["achievementIds": updatedUser.achievementIds]
+    )
+  }
+
+  func updateAchievementUnlocks(_ achievementId: String) async throws {
+    let achievement = try await achievementsManager.getDocument(id: achievementId)
+    if !achievement.isUnlockedBy(userId: UserId.current.rawValue) {
+      var updatedAchievement = achievement
+      updatedAchievement.unlockedBy.append(
+        AchievementUnlockModel(userId: UserId.current.rawValue)
+      )
+      try await achievementsManager.updateDocument(
+        id: achievementId,
+        data: updatedAchievement.toFirestore()
+      )
+      unlockedAchievement = achievement.country
+    }
   }
 }

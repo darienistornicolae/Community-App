@@ -8,7 +8,7 @@ enum UserId: String {
   case user4 = "user_004"
   case user5 = "user_005"
 
-  static var current: UserId = .user4
+  static var current: UserId = .user2
 }
 
 struct UserModel {

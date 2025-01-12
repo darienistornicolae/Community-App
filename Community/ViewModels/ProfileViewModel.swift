@@ -55,6 +55,7 @@ class ProfileViewModel: ObservableObject {
 
   @MainActor
   func uploadProfileImage(_ imageData: Data) async {
+    guard !isUploadingImage else { return }
     isUploadingImage = true
     defer { isUploadingImage = false }
 
