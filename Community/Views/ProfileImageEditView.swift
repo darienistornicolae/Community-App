@@ -84,7 +84,6 @@ struct ProfileImageEditView: View {
   }
 }
 
-// MARK: - Image Preview Section
 private struct ImagePreviewSection: View {
   let selectedImageData: Data?
   let profileImageUrl: String?
@@ -149,7 +148,7 @@ private struct ImagePreviewSection: View {
   }
 }
 
-// MARK: - Guidelines Section
+
 private struct GuidelinesSection: View {
   var body: some View {
     VStack(spacing: Spacing.medium) {

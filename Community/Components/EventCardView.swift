@@ -1,6 +1,6 @@
 import SwiftUI
 
-private enum PresentationItem: Identifiable {
+enum EventItemsView: Identifiable {
   case participants
   case quiz
 
@@ -10,7 +10,7 @@ private enum PresentationItem: Identifiable {
 struct EventCardView: View {
   @StateObject private var viewModel: EventViewModel
   @EnvironmentObject private var pointsManager: PointsManager
-  @State private var presentationItem: PresentationItem?
+  @State private var presentationItem: EventItemsView?
   @State private var showingPaymentAlert = false
   @State private var showingErrorAlert = false
   @State private var errorMessage = ""
@@ -26,123 +26,15 @@ struct EventCardView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
-      HStack {
-        if let creator = viewModel.event.creator, let imageUrl = creator.profileImageUrl {
-          CachedAsyncImage(url: imageUrl) { image in
-            image
-              .resizable()
-              .scaledToFill()
-              .frame(width: 40, height: 40)
-              .clipShape(Circle())
-              .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: Spacing.halfPointSmall))
-          } placeholder: {
-            ProgressView()
-              .frame(width: 40, height: 40)
-          }
-        } else {
-          Circle()
-            .fill(Color.gray.opacity(0.3))
-            .frame(width: 40, height: 40)
-            .overlay(
-              Image(systemName: "person.crop.circle.fill")
-                .resizable()
-                .padding(8)
-                .foregroundColor(.gray)
-            )
-        }
+      EventCardHeaderView(event: viewModel.event, presentationItem: $presentationItem)
+      EventCardBodyView(event: viewModel.event)
 
-        VStack(alignment: .leading, spacing: 2) {
-          Text(viewModel.event.creator?.name ?? viewModel.event.userId)
-            .font(.headline)
-          Text(viewModel.event.location)
-            .font(.subheadline)
-            .foregroundColor(.gray)
-        }
-        .padding(.leading, Spacing.small)
-
-        Spacer()
-
-        Menu {
-          ShareLink(item: shareMessage) {
-            Label("Share Event", systemImage: "square.and.arrow.up")
-          }
-
-          if viewModel.event.isCreator(userId: currentUserId) {
-            Button {
-              presentationItem = .participants
-            } label: {
-              Label("View Participants", systemImage: "person.2")
-            }
-          }
-        } label: {
-          Image(systemName: "ellipsis")
-            .foregroundColor(.primary)
-            .padding(Spacing.small)
-        }
-      }
-      .padding(.horizontal)
-      .padding(.vertical, Spacing.small)
-
-      Divider()
-        .padding(.horizontal)
-
-      if let imageUrl = viewModel.event.imageUrl {
-        CachedAsyncImage(url: imageUrl) { image in
-          image
-            .resizable()
-            .scaledToFill()
-            .frame(maxWidth: .infinity)
-            .frame(height: 300)
-            .clipped()
-            .opacity(viewModel.event.hasEnded ? 0.6 : 1.0)
-        } placeholder: {
-          ProgressView()
-            .frame(maxWidth: .infinity)
-            .frame(height: 300)
-        }
-      } else {
-        defaultEventBackground
-          .frame(height: 300)
-      }
-
-      Divider()
-        .padding(.horizontal)
-
-      HStack(spacing: Spacing.large) {
-        Button {
-          withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-            isLiked.toggle()
-          }
-        } label: {
-          Image(systemName: isLiked ? "heart.fill" : "heart")
-            .font(.title2)
-            .foregroundColor(isLiked ? .red : .primary)
-            .symbolEffect(.bounce, value: isLiked)
-        }
-        .disabled(viewModel.event.hasEnded)
-        .opacity(viewModel.event.hasEnded ? 0.6 : 1.0)
-
-        Button {
-          // Display the comments section. Probably in a future PR
-        } label: {
-          Image(systemName: "bubble.right")
-            .font(.title2)
-        }
-        .disabled(viewModel.event.hasEnded)
-        .opacity(viewModel.event.hasEnded ? 0.6 : 1.0)
-        
-        ShareLink(item: shareMessage) {
-          Image(systemName: "paperplane")
-            .font(.title2)
-            .foregroundColor(.primary)
-        }
-        .opacity(viewModel.event.hasEnded ? 0.6 : 1.0)
-
-        Spacer()
-
-        eventStatusView
-      }
-      .padding()
+      EventCardFooterView(
+        event: viewModel.event,
+        isLiked: $isLiked,
+        presentationItem: $presentationItem,
+        status: viewModel.status
+      )
 
       Divider()
         .padding(.horizontal)
@@ -161,8 +53,9 @@ struct EventCardView: View {
           .foregroundColor(.gray)
           .padding(.top, Spacing.extraSmall)
       }
-      .padding(.horizontal)
-      .padding(.bottom)
+      .padding(.horizontal, Spacing.default)
+      .padding(.vertical, Spacing.medium)
+      
     }
     .background(Color(.systemBackground))
     .clipShape(RoundedRectangle(cornerRadius: Spacing.small))
@@ -202,7 +95,7 @@ struct EventCardView: View {
   }
 }
 
-// MARK: Private
+// MARK: - Private
 private extension EventCardView {
   func joinEvent() async {
     do {
@@ -221,59 +114,5 @@ private extension EventCardView {
       errorMessage = "Failed to join event"
       showingErrorAlert = true
     }
-  }
-
-  var shareMessage: String {
-    """
-    Join me at \(viewModel.event.title)!
-    📍 \(viewModel.event.location)
-    📅 \(viewModel.event.formattedDate)
-    
-    \(viewModel.event.description)
-    """
-  }
-
-  var eventStatusView: some View {
-    let status = viewModel.status
-    return EventStatusLabel(
-      title: status.title,
-      icon: status.icon,
-      color: status.color,
-      action: status.isJoinable ? { presentationItem = .quiz } : nil
-    )
-  }
-
-  var defaultEventBackground: some View {
-    LinearGradient(
-      colors: viewModel.event.hasEnded ?
-        [Color.gray.opacity(0.7), Color.gray.opacity(0.7)] :
-        [.blue.opacity(0.7), .purple.opacity(0.7)],
-      startPoint: .topLeading,
-      endPoint: .bottomTrailing
-    )
-    .overlay(
-      VStack(spacing: Spacing.medium) {
-        Text(viewModel.event.title)
-          .font(.title2)
-          .bold()
-          .multilineTextAlignment(.center)
-          .foregroundColor(.white)
-        
-        Text(viewModel.event.formattedDate)
-          .font(.subheadline)
-          .foregroundColor(.white.opacity(0.8))
-        
-        if viewModel.event.hasEnded {
-          Text("Event Ended")
-            .font(.headline)
-            .foregroundColor(.white)
-            .padding(.horizontal, Spacing.default)
-            .padding(.vertical, Spacing.small)
-            .background(Color.black.opacity(0.6))
-            .clipShape(Capsule())
-        }
-      }
-      .padding()
-    )
   }
 }

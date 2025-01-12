@@ -21,7 +21,7 @@ private enum PresentationItem: Identifiable {
 struct ProfileView: View {
   @StateObject private var viewModel = ProfileViewModel()
   @State private var presentationItem: PresentationItem?
-  
+
   var body: some View {
     NavigationStack {
       List {
@@ -42,16 +42,7 @@ struct ProfileView: View {
         case .imageEdit:
           ProfileImageEditView(viewModel: viewModel)
         case .pointsHistory(let transactions):
-          NavigationStack {
-            PointsTransactionView(transactions: transactions)
-              .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                  Button("Done") {
-                    presentationItem = nil
-                  }
-                }
-              }
-          }
+          PointsTransactionView(transactions: transactions)
         case .settings:
           SettingsView()
         }

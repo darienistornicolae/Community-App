@@ -62,8 +62,7 @@ class ProfileViewModel: ObservableObject {
     do {
       let compressedData = storageManager.compressImageData(imageData, maxSizeKB: 500)
       let path = storageManager.generateImagePath(for: "profile_images")
-      
-      // If there's an existing profile image, delete it
+
       if let oldImagePath = user.profileImageUrl {
         try? await storageManager.deleteFile(at: oldImagePath)
       }
@@ -77,7 +76,7 @@ class ProfileViewModel: ObservableObject {
   }
 }
 
-// MARK: - Points Management
+// MARK: - Private
 private extension ProfileViewModel {
   func setupPointsObserver() {
     guard let observableManager = pointsManager as? PointsManager else { return }
@@ -104,10 +103,7 @@ private extension ProfileViewModel {
       print("Error loading points history: \(error)")
     }
   }
-}
 
-// MARK: - User Management
-private extension ProfileViewModel {
   func loadUser() async {
     do {
       let loadedUser = try await userManager.getDocument(id: user.id)

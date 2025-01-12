@@ -5,6 +5,5 @@ struct LoginCheckView: View {
   
   var body: some View {
       TabBarController()
-
   }
 }
