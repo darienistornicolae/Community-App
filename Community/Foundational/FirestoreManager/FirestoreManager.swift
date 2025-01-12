@@ -17,6 +17,7 @@ protocol FirestoreProtocol {
   func getDocument(id: String) async throws -> T
   func createDocument(id: String, data: [String: Any]) async throws
   func listen(onChange: @escaping ([T]) -> Void) -> ListenerRegistration
+  func listenToDocument(id: String, onChange: @escaping (T?) -> Void) -> ListenerRegistration
 }
 
 enum FirestoreError: LocalizedError {
@@ -135,5 +136,27 @@ final class FirestoreManager<T: FirestoreConvertible>: FirestoreProtocol {
     } catch {
       throw FirestoreError.failedToUpload
     }
+  }
+
+  func listenToDocument(id: String, onChange: @escaping (T?) -> Void) -> ListenerRegistration {
+    dataBase.collection(collection)
+      .document(id)
+      .addSnapshotListener { snapshot, error in
+        if let error = error {
+          print("Error listening for document updates: \(error)")
+          onChange(nil)
+          return
+        }
+
+        guard let data = snapshot?.data() else {
+          onChange(nil)
+          return
+        }
+
+        var documentData = data
+        documentData["id"] = snapshot?.documentID
+        let item = T.fromFirestore(documentData)
+        onChange(item)
+      }
   }
 }

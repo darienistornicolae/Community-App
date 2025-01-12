@@ -1,7 +1,11 @@
 import SwiftUI
 
 struct HomeView: View {
-  @ObservedObject var viewModel: HomeViewModel
+  @StateObject var viewModel: HomeViewModel
+
+  init(viewModel: @autoclosure @escaping () -> HomeViewModel) {
+    self._viewModel = StateObject(wrappedValue: viewModel())
+  }
 
   var body: some View {
     ZStack {

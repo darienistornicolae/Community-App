@@ -1,24 +1,12 @@
 import Foundation
 import SwiftUI
+import FirebaseFirestore
 
 @MainActor
 class EventViewModel: ObservableObject {
   @Published private(set) var event: EventModel
   @Published private(set) var isLoading = false
   @Published private(set) var error: Error?
-
-  private let eventManager: FirestoreManager<EventModel>
-  private let userManager: FirestoreManager<UserModel>
-
-  init(event: EventModel) {
-    self.event = event
-    self.eventManager = FirestoreManager(collection: "events")
-    self.userManager = FirestoreManager(collection: "users")
-
-    Task {
-      await fetchCreator()
-    }
-  }
 
   var status: EventStatus {
     switch (
@@ -37,18 +25,36 @@ class EventViewModel: ObservableObject {
     }
   }
 
-  func fetchCreator() async {
-    guard event.creator == nil else { return }
+  private let eventManager: FirestoreManager<EventModel>
+  private let userManager: FirestoreManager<UserModel>
+  private var creatorListener: ListenerRegistration?
 
-    isLoading = true
-    defer { isLoading = false }
+  init(event: EventModel) {
+    self.event = event
+    self.eventManager = FirestoreManager(collection: "events")
+    self.userManager = FirestoreManager(collection: "users")
 
-    do {
-      let creator = try await userManager.getDocument(id: event.userId)
-      event.creator = creator
-    } catch {
-      self.error = error
-      print("Error fetching creator: \(error)")
+    Task {
+      await setupCreatorListener()
+    }
+  }
+
+  deinit {
+    creatorListener?.remove()
+  }
+
+  private func setupCreatorListener() async {
+    creatorListener?.remove()
+
+    creatorListener = userManager.listenToDocument(id: event.userId) { [weak self] updatedCreator in
+      guard let self = self else { return }
+
+      if let updatedCreator = updatedCreator {
+        self.event.creator = updatedCreator
+      } else {
+        self.error = FirestoreError.failedToFetch
+        print("Error: Creator document not found or error occurred")
+      }
     }
   }
 

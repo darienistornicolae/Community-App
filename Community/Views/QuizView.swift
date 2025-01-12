@@ -35,7 +35,7 @@ struct QuizView: View {
   }
 }
 
-// MARK: - Private Views
+// MARK: - Private
 private extension QuizView {
   func quizContent(_ quiz: QuizModel) -> some View {
     VStack(spacing: Spacing.large) {
