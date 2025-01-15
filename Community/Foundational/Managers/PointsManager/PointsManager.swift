@@ -99,6 +99,10 @@ class PointsManager: @preconcurrency PointsManagerProtocol, ObservableObject {
 
     try await userService.updateUser(id: userId, data: updateData)
     await refreshPoints(for: userId)
+
+    if type == .reward {
+      await QuestProgressManager.shared.handlePointsEarned(amount: amount)
+    }
   }
 
   func spendPoints(
@@ -137,5 +141,14 @@ class PointsManager: @preconcurrency PointsManagerProtocol, ObservableObject {
   func getTransactionHistory(for userId: String) async throws -> [PointsTransaction] {
     let user = try await userService.getUser(id: userId)
     return user.pointsHistory.sorted { $0.timestamp > $1.timestamp }
+  }
+
+  func getTotalPoints(for userId: String) async -> Int {
+    do {
+      return try await getCurrentBalance(for: userId)
+    } catch {
+      print("Error getting total points: \(error)")
+      return 0
+    }
   }
 }
