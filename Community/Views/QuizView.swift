@@ -217,14 +217,14 @@ private extension QuizView {
     Button {
       withAnimation {
         if result {
-          onComplete(true)
           dismiss()
+          onComplete(true)
         } else {
           viewModel.reset()
         }
       }
     } label: {
-      Text(result ? "Join Event" : "Try Again")
+      Text(result ? "Continue" : "Try Again")
         .font(.headline)
         .foregroundColor(.white)
         .frame(maxWidth: .infinity)

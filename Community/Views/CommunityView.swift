@@ -2,6 +2,7 @@ import SwiftUI
 
 struct CommunityView: View {
   @StateObject private var viewModel = CommunityViewModel()
+  @State private var selectedQuiz: QuizModel?
 
   var body: some View {
     NavigationStack {
@@ -49,6 +50,15 @@ struct CommunityView: View {
           Text(errorMessage)
         }
       }
+      .fullScreenCover(item: $selectedQuiz) { quiz in
+        QuizView(eventId: quiz.id) { completed in
+          if completed {
+            Task {
+              await viewModel.fetchData()
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -72,9 +82,16 @@ private extension CommunityView {
       Text("Available Quizzes")
         .font(.title2)
         .bold()
-      
+
       ForEach(viewModel.quizzes) { quiz in
-        QuizCardView(quiz: quiz)
+        Button {
+          if !quiz.participants.contains(UserId.current.rawValue) {
+            selectedQuiz = quiz
+          }
+        } label: {
+          QuizCardView(quiz: quiz)
+        }
+        .buttonStyle(.plain)
       }
     }
   }
