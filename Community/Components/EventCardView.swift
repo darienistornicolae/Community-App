@@ -37,7 +37,6 @@ struct EventCardView: View {
       )
 
       Divider()
-        .padding(.horizontal)
 
       VStack(alignment: .leading, spacing: Spacing.small) {
         Text(viewModel.event.formattedParticipants)
@@ -53,9 +52,7 @@ struct EventCardView: View {
           .foregroundColor(.gray)
           .padding(.top, Spacing.extraSmall)
       }
-      .padding(.horizontal, Spacing.default)
-      .padding(.vertical, Spacing.medium)
-      
+      .padding()
     }
     .background(Color(.systemBackground))
     .clipShape(RoundedRectangle(cornerRadius: Spacing.small))

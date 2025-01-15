@@ -58,8 +58,7 @@ struct EventCardHeaderView: View {
           .padding(Spacing.small)
       }
     }
-    .padding(.horizontal, Spacing.default)
-    .padding(.vertical, Spacing.medium)
+    .padding()
   }
   private func shareMessage(event: EventModel) -> String {
     """

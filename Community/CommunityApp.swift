@@ -9,6 +9,7 @@ struct CommunityApp: App {
     WindowGroup {
       LoginCheckView()
         .environmentObject(pointsManager)
+        .preferredColorScheme(.light)
     }
   }
 }

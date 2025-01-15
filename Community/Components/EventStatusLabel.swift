@@ -57,7 +57,7 @@ enum EventStatus {
     case .joined:
       return "Joined"
     case .joinable(let points):
-      return "\(points) Points"
+      return "Join for \(points) Points"
     }
   }
 
@@ -70,7 +70,7 @@ enum EventStatus {
     case .joined:
       return "checkmark.circle.fill"
     case .joinable:
-      return "ticket.fill"
+      return ""
     }
   }
 

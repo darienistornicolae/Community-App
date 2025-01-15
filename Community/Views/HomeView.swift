@@ -11,22 +11,20 @@ struct HomeView: View {
     ZStack {
       NavigationStack {
         ScrollView {
-          VStack(spacing: Spacing.large) {
-            LazyVStack(spacing: Spacing.default) {
-              ForEach(viewModel.events) { event in
-                EventCardView(
-                  event: event,
-                  currentUserId: viewModel.currentUserId,
-                  onJoin: {
-                    Task {
-                      await viewModel.joinEvent(event)
-                    }
+          VStack(spacing: Spacing.default) {
+            ForEach(viewModel.events) { event in
+              EventCardView(
+                event: event,
+                currentUserId: viewModel.currentUserId,
+                onJoin: {
+                  Task {
+                    await viewModel.joinEvent(event)
                   }
-                )
-              }
+                }
+              )
             }
-            .padding(.horizontal)
           }
+          .padding(.horizontal)
         }
         .navigationTitle("Community Events")
         .navigationBarTitleDisplayMode(.large)
