@@ -5,6 +5,7 @@ struct EventCreationView: View {
   @Environment(\.dismiss) private var dismiss
   @StateObject private var viewModel = EventCreationViewModel()
   @State private var selectedItem: PhotosPickerItem?
+  @State private var selectedImage: UIImage?
 
   var body: some View {
     NavigationStack {
@@ -16,24 +17,16 @@ struct EventCreationView: View {
         }
 
         Section("Event Image (Optional)") {
-          if let imageUrl = viewModel.imageUrl {
-            AsyncImage(url: URL(string: imageUrl)) { image in
-              image
-                .resizable()
-                .scaledToFit()
-                .frame(maxHeight: 200)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            } placeholder: {
-              RoundedRectangle(cornerRadius: 12)
-                .fill(Color.gray.opacity(0.1))
-                .frame(height: 200)
-                .overlay(
-                  ProgressView()
-                )
-            }
-
+          if let image = selectedImage {
+            Image(uiImage: image)
+              .resizable()
+              .scaledToFit()
+              .frame(maxHeight: 200)
+              .clipShape(RoundedRectangle(cornerRadius: 12))
+            
             Button("Remove Image", role: .destructive) {
-              viewModel.imageUrl = nil
+              selectedImage = nil
+              selectedItem = nil
             }
           } else {
             PhotosPicker(selection: $selectedItem, matching: .images) {
@@ -48,7 +41,14 @@ struct EventCreationView: View {
         }
 
         Section {
-          Stepper("Entry Price: \(viewModel.price) Points", value: $viewModel.price, in: 0...1000, step: 5)
+          Stepper("Entry Price: \(viewModel.price) Points", value: $viewModel.price, in: 0...100, step: 5)
+          
+          VStack(alignment: .leading, spacing: Spacing.small) {
+            Text("Entry price is deducted from participant's points when they join")
+              .font(.caption)
+              .foregroundColor(.gray)
+          }
+          .padding(.vertical, Spacing.small)
         }
       }
       .navigationTitle("Create Event")
@@ -63,6 +63,9 @@ struct EventCreationView: View {
         ToolbarItem(placement: .confirmationAction) {
           Button("Create") {
             Task {
+              if let item = selectedItem {
+                await viewModel.uploadImage(item)
+              }
               await viewModel.createEvent()
               if !viewModel.showError {
                 dismiss()
@@ -80,7 +83,10 @@ struct EventCreationView: View {
       .onChange(of: selectedItem) { oldValue, newValue in
         if let item = newValue {
           Task {
-            await viewModel.uploadImage(item)
+            if let data = try? await item.loadTransferable(type: Data.self),
+               let image = UIImage(data: data) {
+              selectedImage = image
+            }
           }
         }
       }
