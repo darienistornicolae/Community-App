@@ -67,7 +67,7 @@ private extension FloatingActionButton {
       }
       presentationView = .quizCreation
     } label: {
-      Image(systemName: "questionmark.circle.fill")
+      Image(systemName: "pencil.and.list.clipboard")
         .foregroundColor(.white)
         .font(.system(size: Spacing.large))
         .frame(width: 45, height: 45)
