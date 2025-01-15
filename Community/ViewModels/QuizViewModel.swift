@@ -58,6 +58,7 @@ private extension QuizViewModel {
     do {
       try await awardPoints(quiz)
       try await updateQuizParticipants(quiz)
+      await QuestProgressManager.shared.handleQuizCompletion(quizId: quiz.id)
 
       if let achievementId = quiz.achievementId {
         try await handleAchievement(achievementId)

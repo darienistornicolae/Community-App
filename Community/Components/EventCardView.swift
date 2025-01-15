@@ -103,6 +103,7 @@ private extension EventCardView {
         description: "Joined event: \(viewModel.event.title)"
       )
       try await viewModel.joinEvent()
+      await QuestProgressManager.shared.handleEventParticipation(eventId: viewModel.event.id)
       onJoin()
     } catch PointsError.insufficientPoints {
       errorMessage = "You don't have enough points to join this event"
