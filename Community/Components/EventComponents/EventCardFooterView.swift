@@ -7,7 +7,7 @@ struct EventCardFooterView: View {
   let status: EventStatus
   
   var body: some View {
-    HStack(spacing: Spacing.large) {
+    HStack {
       Button {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
           isLiked.toggle()
@@ -39,6 +39,6 @@ struct EventCardFooterView: View {
         action: status.isJoinable ? { presentationItem = .quiz } : nil
       )
     }
-    .padding(Spacing.default)
+    .padding(Spacing.small)
   }
 }

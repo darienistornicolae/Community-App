@@ -5,6 +5,8 @@ struct QuizCreationView: View {
   @Environment(\.dismiss) private var dismiss
   @StateObject private var viewModel = QuizCreationViewModel()
   @State private var selectedItem: PhotosPickerItem?
+  @State private var previewImage: Image?
+  @State private var isLoadingImage = false
 
   var body: some View {
     NavigationStack {
@@ -29,6 +31,9 @@ struct QuizCreationView: View {
         ToolbarItem(placement: .confirmationAction) {
           Button("Create") {
             Task {
+              if let item = selectedItem {
+                await viewModel.uploadImage(item)
+              }
               await viewModel.createQuiz()
               if !viewModel.showError {
                 dismiss()
@@ -43,11 +48,11 @@ struct QuizCreationView: View {
       } message: {
         Text(viewModel.errorMessage ?? "An unknown error occurred")
       }
-      .onChange(of: selectedItem) { oldValue, newValue in
+      .onChange(of: selectedItem) { _, newValue in
         if let item = newValue {
-          Task {
-            await viewModel.uploadImage(item)
-          }
+          loadPreviewImage(from: item)
+        } else {
+          previewImage = nil
         }
       }
     }
@@ -65,28 +70,34 @@ private extension QuizCreationView {
 
   var imageSection: some View {
     Section("Image (Optional)") {
-      if let imageUrl = viewModel.imageUrl {
-        AsyncImage(url: URL(string: imageUrl)) { image in
+      if let image = previewImage {
+        VStack(alignment: .leading, spacing: Spacing.medium) {
           image
             .resizable()
-            .scaledToFit()
-            .frame(maxHeight: 200)
+            .aspectRatio(contentMode: .fit)
+            .frame(maxWidth: .infinity)
+            .frame(height: 200)
             .clipShape(RoundedRectangle(cornerRadius: 12))
-        } placeholder: {
+
+          Button(role: .destructive) {
+            selectedItem = nil
+          } label: {
+            Label("Remove Image", systemImage: "trash")
+          }
+        }
+      } else {
+        if isLoadingImage {
           RoundedRectangle(cornerRadius: 12)
             .fill(Color.gray.opacity(0.1))
+            .frame(maxWidth: .infinity)
             .frame(height: 200)
             .overlay(
               ProgressView()
             )
-        }
-
-        Button("Remove Image", role: .destructive) {
-          viewModel.imageUrl = nil
-        }
-      } else {
-        PhotosPicker(selection: $selectedItem, matching: .images) {
-          Label("Add Image", systemImage: "photo")
+        } else {
+          PhotosPicker(selection: $selectedItem, matching: .images) {
+            Label("Add Image", systemImage: "photo")
+          }
         }
       }
     }
@@ -110,12 +121,23 @@ private extension QuizCreationView {
 
   var pointsSection: some View {
     Section {
+      Text("Quiz Points")
+        .font(.headline)
+
+      Text("Points awarded to participants for correct answers. These points contribute to their community score and leaderboard position.")
+        .font(.caption)
+        .foregroundColor(.gray)
       Stepper("Points: \(viewModel.points)", value: $viewModel.points, in: 5...50, step: 5)
     }
   }
 
   var achievementSection: some View {
-    Section("Achievement Reward (Optional)") {
+    Section {
+      Text("Achievement Reward")
+        .font(.headline)
+      Text("Select a country flag that participants will unlock when they correctly answer this quiz. (Optional)")
+        .font(.caption)
+        .foregroundColor(.gray)
       if let selected = viewModel.selectedAchievement {
         selectedAchievementView(selected)
       } else {
@@ -134,7 +156,7 @@ private extension QuizCreationView {
             .scaledToFit()
             .frame(width: 80, height: 60)
             .clipShape(RoundedRectangle(cornerRadius: Spacing.small))
-          
+
           Text(achievement.displayName)
             .font(.caption)
         }
@@ -178,6 +200,19 @@ private extension QuizCreationView {
     .cornerRadius(Spacing.medium)
     .onTapGesture {
       viewModel.selectedAchievement = achievement
+    }
+  }
+
+  func loadPreviewImage(from item: PhotosPickerItem) {
+    isLoadingImage = true
+    Task {
+      if let data = try? await item.loadTransferable(type: Data.self),
+         let uiImage = UIImage(data: data) {
+        await MainActor.run {
+          previewImage = Image(uiImage: uiImage)
+          isLoadingImage = false
+        }
+      }
     }
   }
 }

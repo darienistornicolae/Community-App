@@ -8,7 +8,7 @@ struct EventCardBodyView: View {
       CachedAsyncImage(url: imageUrl) { image in
         image
           .resizable()
-          .scaledToFill()
+          .scaledToFit()
           .frame(maxWidth: .infinity)
           .frame(height: 300)
           .clipped()
