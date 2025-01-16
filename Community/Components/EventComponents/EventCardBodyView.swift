@@ -1,23 +1,28 @@
 import SwiftUI
 
 struct EventCardBodyView: View {
-  let event: EventModel
+    let event: EventModel
 
-  var body: some View {
-    if let imageUrl = event.imageUrl {
-      CachedAsyncImage(url: imageUrl) { image in
-        image
-          .resizable()
-          .scaledToFit()
-          .frame(maxWidth: .infinity)
-          .frame(height: 300)
-          .clipped()
-          .opacity(event.hasEnded ? 0.6 : 1.0)
-      } placeholder: {
-        ProgressView()
-          .frame(maxWidth: .infinity)
-          .frame(height: 300)
-      }
+    @State private var imageSize: CGSize? = nil
+
+    var body: some View {
+        if let imageURL = event.imageUrl {
+            CachedAsyncImage(url: imageURL) { image in
+                image
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(maxWidth: .infinity, minHeight: 300)
+                    .background(GeometryReader { geometry in
+                        Color.clear
+                            .onAppear {
+                                imageSize = geometry.size
+                            }
+                    })
+                    .frame(height: (imageSize?.height ?? 0) > 500 ? 500 : nil)
+                    .clipped()
+            } placeholder: {
+                ProgressView()
+            }
     } else {
       defaultEventBackground(event: event)
         .frame(height: 300)
