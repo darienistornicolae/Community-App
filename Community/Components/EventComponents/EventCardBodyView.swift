@@ -18,7 +18,7 @@ struct EventCardBodyView: View {
                                 imageSize = geometry.size
                             }
                     })
-                    .frame(height: (imageSize?.height ?? 0) > 500 ? 500 : nil)
+                    .frame(height: (imageSize?.height ?? 0) > 425 ? 425 : nil)
                     .clipped()
             } placeholder: {
                 ProgressView()
