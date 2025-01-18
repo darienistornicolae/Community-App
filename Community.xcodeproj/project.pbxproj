@@ -284,7 +284,7 @@
 				DEVELOPMENT_TEAM = V975Z3G3HV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Community;
+				INFOPLIST_KEY_CFBundleDisplayName = Neighborly;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera so you can post your best picks!";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -321,7 +321,7 @@
 				DEVELOPMENT_TEAM = V975Z3G3HV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Community;
+				INFOPLIST_KEY_CFBundleDisplayName = Neighborly;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.social-networking";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need access to your camera so you can post your best picks!";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
