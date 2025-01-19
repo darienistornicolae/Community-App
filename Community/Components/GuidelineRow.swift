@@ -8,11 +8,12 @@ struct GuidelineRow: View {
     HStack(spacing: Spacing.medium) {
       Image(systemName: icon)
         .font(.system(size: 24))
-        .foregroundColor(.blue)
+        .foregroundColor(.accentColour)
         .frame(width: Spacing.extraExtraLarge)
       
       Text(text)
         .font(.subheadline)
+        .foregroundStyle(.accentColour)
     }
   }
 }

@@ -28,13 +28,16 @@ struct CommunityView: View {
         #endif
         }
         .padding()
+        .background(Color.primaryColour)
       }
+      .background(Color.primaryColour)
       .navigationTitle("Community")
       .overlay {
         if viewModel.isLoading {
           ProgressView()
         }
       }
+      
       .refreshable {
         await viewModel.fetchData()
       }
@@ -96,3 +99,7 @@ private extension CommunityView {
     }
   }
 }
+#Preview {
+  CommunityView()
+}
+

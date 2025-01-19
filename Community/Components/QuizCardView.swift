@@ -28,20 +28,21 @@ struct QuizCardView: View {
         HStack {
           Label("\(quiz.points) points", systemImage: "star.fill")
             .font(.caption)
-            .foregroundColor(.orange)
+            .foregroundColor(.accentColour)
 
           Spacer()
 
           if quiz.participants.contains(UserId.current.rawValue) {
             Label("Completed", systemImage: "checkmark.circle.fill")
               .font(.caption)
-              .foregroundColor(.green)
+              .foregroundColor(.accentColour)
           }
         }
       }
+      .background(Color.secondaryColour)
     }
     .padding()
-    .background(Color(.systemBackground))
+    .background(Color.secondaryColour)
     .clipShape(RoundedRectangle(cornerRadius: Spacing.medium))
     .shadow(color: .black.opacity(0.1), radius: 5)
   }

@@ -30,6 +30,7 @@ struct ProfileView: View {
         bioSection
         postsSection
       }
+      .background(Color.primaryColour)
       .navigationTitle("Profile")
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
@@ -48,6 +49,7 @@ struct ProfileView: View {
         }
       }
     }
+    .background(Color(.primaryColour))
   }
 }
 

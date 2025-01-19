@@ -24,8 +24,10 @@ struct HomeView: View {
               )
             }
           }
+          .background(Color.primaryColour)
           .padding(.horizontal)
         }
+        .background(Color.primaryColour)
         .navigationTitle("Community Events")
         .navigationBarTitleDisplayMode(.large)
         .refreshable {

@@ -15,7 +15,7 @@ struct CountryAchievementCell: View {
             RoundedRectangle(cornerRadius: Spacing.small)
               .fill(Color.black.opacity(0.5))
             Image(systemName: "lock.fill")
-              .foregroundColor(.white)
+              .foregroundColor(.secondaryColour)
           }
         }
 

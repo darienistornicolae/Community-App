@@ -49,12 +49,12 @@ struct EventCardView: View {
 
         Text(viewModel.event.formattedDate)
           .font(.caption)
-          .foregroundColor(.gray)
+          .foregroundColor(.accentColour)
           .padding(.top, Spacing.extraSmall)
       }
       .padding()
     }
-    .background(Color(.systemBackground))
+    .background(Color(.primaryColour))
     .clipShape(RoundedRectangle(cornerRadius: Spacing.small))
     .overlay(
       RoundedRectangle(cornerRadius: Spacing.small)
