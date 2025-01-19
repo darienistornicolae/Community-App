@@ -10,7 +10,7 @@ class ProfileViewModel: ObservableObject {
   @Published private(set) var pointsHistory: [PointsTransaction] = []
   @Published private(set) var isUploadingImage = false
 
-  private let userManager: FirestoreManager<UserModel>
+  private let userManager: any FirestoreProtocol<UserModel>
   private let pointsManager: PointsManagerProtocol
   private let storageManager: FirebaseImageStoarageProtocol
   private var cancellables = Set<AnyCancellable>()
@@ -19,11 +19,12 @@ class ProfileViewModel: ObservableObject {
 
   init(
     user: UserModel = .initialUser(),
+    userManager: any FirestoreProtocol<UserModel> = FirestoreManager(collection: "users"),
     pointsManager: PointsManagerProtocol? = nil,
     storageManager: FirebaseImageStoarageProtocol = FirebaseStorageManager()
   ) {
     self.user = user
-    self.userManager = FirestoreManager(collection: "users")
+    self.userManager = userManager
     self.pointsManager = pointsManager ?? PointsManager.shared
     self.storageManager = storageManager
 

@@ -7,7 +7,7 @@ protocol FirestoreConvertible {
   func toFirestore() -> [String: Any]
 }
 
-protocol FirestoreProtocol {
+protocol FirestoreProtocol<T> {
   associatedtype T: FirestoreConvertible
   var collection: String { get }
   func fetch() async throws -> [T]

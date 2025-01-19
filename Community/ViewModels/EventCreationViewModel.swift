@@ -14,7 +14,7 @@ class EventCreationViewModel: ObservableObject {
   @Published var showError: Bool = false
   @Published private(set) var isUploadingImage = false
   
-  private let eventManager: FirestoreManager<EventModel>
+  private let eventManager: any FirestoreProtocol<EventModel>
   private let storageManager: FirebaseImageStoarageProtocol
   
   var isValid: Bool {
@@ -25,8 +25,11 @@ class EventCreationViewModel: ObservableObject {
     !isUploadingImage
   }
   
-  init(storageManager: FirebaseImageStoarageProtocol = FirebaseStorageManager()) {
-    self.eventManager = FirestoreManager(collection: "events")
+  init(
+    eventManager: any FirestoreProtocol<EventModel> = FirestoreManager(collection: "events"),
+    storageManager: FirebaseImageStoarageProtocol = FirebaseStorageManager()
+  ) {
+    self.eventManager = eventManager
     self.storageManager = storageManager
   }
   

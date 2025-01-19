@@ -9,7 +9,7 @@ class HomeViewModel: ObservableObject {
   @Published private(set) var events: [EventModel] = []
 
   private let pointsManager: PointsManagerProtocol
-  private let eventManager: FirestoreManager<EventModel>
+  private let eventManager: any FirestoreProtocol<EventModel>
   private let userId: String
   private var cancellables = Set<AnyCancellable>()
   private var eventsListener: ListenerRegistration?
@@ -20,10 +20,11 @@ class HomeViewModel: ObservableObject {
 
   init(
     pointsManager: PointsManagerProtocol? = nil,
+    eventManager: any FirestoreProtocol<EventModel> = FirestoreManager(collection: "events"),
     userId: String = UserId.current.rawValue
   ) {
     self.pointsManager = pointsManager ?? PointsManager.shared
-    self.eventManager = FirestoreManager(collection: "events")
+    self.eventManager = eventManager
     self.userId = userId
 
     setupPointsObserver()

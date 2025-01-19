@@ -6,11 +6,14 @@ class ParticipantViewModel: ObservableObject {
   @Published private(set) var isLoading = false
   @Published private(set) var error: Error?
 
-  private let userManager: FirestoreManager<UserModel>
+  private let userManager: any FirestoreProtocol<UserModel>
 
-  init(userId: String) {
+  init(
+    userId: String,
+    userManager: any FirestoreProtocol<UserModel> = FirestoreManager(collection: "users")
+  ) {
     self.user = UserModel.initialUser()
-    self.userManager = FirestoreManager(collection: "users")
+    self.userManager = userManager
 
     Task {
       await fetchUser(userId: userId)

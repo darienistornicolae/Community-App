@@ -5,13 +5,17 @@ class ParticipantsViewModel: ObservableObject {
   @Published private(set) var participants: [UserModel] = []
 
   private let eventId: String
-  private let eventManager: FirestoreManager<EventModel>
-  private let userManager: FirestoreManager<UserModel>
+  private let eventManager: any FirestoreProtocol<EventModel>
+  private let userManager: any FirestoreProtocol<UserModel>
 
-  init(eventId: String) {
+  init(
+    eventId: String,
+    eventManager: any FirestoreProtocol<EventModel> = FirestoreManager(collection: "events"),
+    userManager: any FirestoreProtocol<UserModel> = FirestoreManager(collection: "users")
+  ) {
     self.eventId = eventId
-    self.eventManager = FirestoreManager(collection: "events")
-    self.userManager = FirestoreManager(collection: "users")
+    self.eventManager = eventManager
+    self.userManager = userManager
   }
 
   func fetchParticipants() async {
