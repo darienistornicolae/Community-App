@@ -9,17 +9,23 @@ class QuizViewModel: ObservableObject {
   @Published private(set) var unlockedAchievement: Asset?
 
   private let eventId: String
-  private let quizManager: FirestoreManager<QuizModel>
+  private let quizManager: any FirestoreProtocol<QuizModel>
   private let pointsManager: PointsManagerProtocol
-  private let achievementsManager: FirestoreManager<CountryAchievementModel>
-  private let userManager: FirestoreManager<UserModel>
+  private let achievementsManager: any FirestoreProtocol<CountryAchievementModel>
+  private let userManager: any FirestoreProtocol<UserModel>
 
-  init(eventId: String, pointsManager: PointsManagerProtocol = PointsManager.shared) {
+  init(
+    eventId: String, 
+    pointsManager: PointsManagerProtocol = PointsManager.shared,
+    quizManager: any FirestoreProtocol<QuizModel> = FirestoreManager(collection: "quizzes"),
+    achievementsManager: any FirestoreProtocol<CountryAchievementModel> = FirestoreManager(collection: "achievements"),
+    userManager: any FirestoreProtocol<UserModel> = FirestoreManager(collection: "users")
+  ) {
     self.eventId = eventId
-    self.quizManager = FirestoreManager(collection: "quizzes")
+    self.quizManager = quizManager
     self.pointsManager = pointsManager
-    self.achievementsManager = FirestoreManager(collection: "achievements")
-    self.userManager = FirestoreManager(collection: "users")
+    self.achievementsManager = achievementsManager
+    self.userManager = userManager
   }
 
   func fetchQuiz() async {

@@ -15,8 +15,8 @@ class QuizCreationViewModel: ObservableObject {
   @Published private(set) var availableAchievements: [Asset] = []
   @Published private(set) var isUploadingImage = false
 
-  private let quizManager: FirestoreManager<QuizModel>
-  private let achievementsManager: FirestoreManager<CountryAchievementModel>
+  private let quizManager: any FirestoreProtocol<QuizModel>
+  private let achievementsManager: any FirestoreProtocol<CountryAchievementModel>
   private let storageManager: FirebaseImageStoarageProtocol
 
   var isValid: Bool {
@@ -27,9 +27,13 @@ class QuizCreationViewModel: ObservableObject {
     !isUploadingImage
   }
 
-  init(storageManager: FirebaseImageStoarageProtocol = FirebaseStorageManager()) {
-    self.quizManager = FirestoreManager(collection: "quizzes")
-    self.achievementsManager = FirestoreManager(collection: "achievements")
+  init(
+    quizManager: any FirestoreProtocol<QuizModel> = FirestoreManager(collection: "quizzes"),
+    achievementsManager: any FirestoreProtocol<CountryAchievementModel> = FirestoreManager(collection: "achievements"),
+    storageManager: FirebaseImageStoarageProtocol = FirebaseStorageManager()
+  ) {
+    self.quizManager = quizManager
+    self.achievementsManager = achievementsManager
     self.storageManager = storageManager
 
     Task {

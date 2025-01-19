@@ -25,14 +25,18 @@ class EventViewModel: ObservableObject {
     }
   }
 
-  private let eventManager: FirestoreManager<EventModel>
-  private let userManager: FirestoreManager<UserModel>
+  private let eventManager: any FirestoreProtocol<EventModel>
+  private let userManager: any FirestoreProtocol<UserModel>
   private var creatorListener: ListenerRegistration?
 
-  init(event: EventModel) {
+  init(
+    event: EventModel,
+    eventManager: any FirestoreProtocol<EventModel> = FirestoreManager(collection: "events"),
+    userManager: any FirestoreProtocol<UserModel> = FirestoreManager(collection: "users")
+  ) {
     self.event = event
-    self.eventManager = FirestoreManager(collection: "events")
-    self.userManager = FirestoreManager(collection: "users")
+    self.eventManager = eventManager
+    self.userManager = userManager
 
     Task {
       await setupCreatorListener()

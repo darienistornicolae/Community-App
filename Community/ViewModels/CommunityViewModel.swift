@@ -7,12 +7,15 @@ class CommunityViewModel: ObservableObject {
   @Published private(set) var isLoading = false
   @Published var errorMessage: String?
 
-  private let questManager: FirestoreManager<QuestModel>
-  private let quizManager: FirestoreManager<QuizModel>
+  private let questManager: any FirestoreProtocol<QuestModel>
+  private let quizManager: any FirestoreProtocol<QuizModel>
 
-  init() {
-    self.questManager = FirestoreManager(collection: "quests")
-    self.quizManager = FirestoreManager(collection: "quizzes")
+  init(
+    questManager: any FirestoreProtocol<QuestModel> = FirestoreManager(collection: "quests"),
+    quizManager: any FirestoreProtocol<QuizModel> = FirestoreManager(collection: "quizzes")
+  ) {
+    self.questManager = questManager
+    self.quizManager = quizManager
   }
 
   var activeQuests: [QuestModel] {
