@@ -4,21 +4,31 @@ import FirebaseFirestore
 @MainActor
 final class QuestProgressManager {
   static let shared = QuestProgressManager()
-  private let questManager: FirestoreManager<QuestModel>
+  private let questManager: any FirestoreProtocol<QuestModel>
+  private let quizManager: any FirestoreProtocol<QuizModel>
+  private let eventManager: any FirestoreProtocol<EventModel>
+  private let achievementManager: any FirestoreProtocol<CountryAchievementModel>
 
-  private init() {
-    self.questManager = FirestoreManager(collection: "quests")
+  private init(
+    questManager: any FirestoreProtocol<QuestModel> = FirestoreManager(collection: "quests"),
+    quizManager: any FirestoreProtocol<QuizModel> = FirestoreManager(collection: "quizzes"),
+    eventManager: any FirestoreProtocol<EventModel> = FirestoreManager(collection: "events"),
+    achievementManager: any FirestoreProtocol<CountryAchievementModel> = FirestoreManager(collection: "achievements")
+  ) {
+    self.questManager = questManager
+    self.quizManager = quizManager
+    self.eventManager = eventManager
+    self.achievementManager = achievementManager
   }
 
   func handleQuizCompletion(quizId: String) async {
     do {
-      let quizManager = FirestoreManager<QuizModel>(collection: "quizzes")
       let quiz = try await quizManager.getDocument(id: quizId)
 
       guard quiz.participants.contains(UserId.current.rawValue) else {
         return
       }
-      
+
       let quests = try await questManager.fetch()
       let quizQuests = quests.filter { quest in
         if case .quizCompletion = quest.requirement {
@@ -48,13 +58,12 @@ final class QuestProgressManager {
 
   func handleEventParticipation(eventId: String) async {
     do {
-      let eventManager = FirestoreManager<EventModel>(collection: "events")
       let event = try await eventManager.getDocument(id: eventId)
 
       guard event.participants.contains(UserId.current.rawValue) else {
         return
       }
-      
+
       let quests = try await questManager.fetch()
       let eventQuests = quests.filter { quest in
         if case .eventParticipation = quest.requirement {
@@ -78,13 +87,12 @@ final class QuestProgressManager {
 
   func handleAchievementUnlock(achievementId: String) async {
     do {
-      let achievementManager = FirestoreManager<CountryAchievementModel>(collection: "achievements")
       let achievement = try await achievementManager.getDocument(id: achievementId)
 
       guard achievement.isUnlockedBy(userId: UserId.current.rawValue) else {
         return
       }
-      
+
       let quests = try await questManager.fetch()
       let achievementQuests = quests.filter { quest in
         if case .achievementCollection = quest.requirement {
@@ -127,8 +135,6 @@ final class QuestProgressManager {
   func initializeQuestProgress() async {
     do {
       let quests = try await questManager.fetch()
-      
-      // Initialize progress for each quest type
       await initializeQuizProgress(quests: quests)
       await initializeEventProgress(quests: quests)
       await initializeAchievementProgress(quests: quests)
@@ -140,13 +146,12 @@ final class QuestProgressManager {
 
   func handleEventParticipationRemoval(eventId: String) async {
     do {
-      let eventManager = FirestoreManager<EventModel>(collection: "events")
       let event = try await eventManager.getDocument(id: eventId)
 
       guard !event.participants.contains(UserId.current.rawValue) else {
         return
       }
-      
+
       let quests = try await questManager.fetch()
       let eventQuests = quests.filter { quest in
         if case .eventParticipation = quest.requirement {
@@ -154,14 +159,14 @@ final class QuestProgressManager {
         }
         return false
       }
-      
+
       for quest in eventQuests {
         let currentQuest = try await questManager.getDocument(id: quest.id)
         var updatedUserProgress = currentQuest.userProgress
 
         if let currentProgress = updatedUserProgress[UserId.current.rawValue], currentProgress > 0 {
           updatedUserProgress[UserId.current.rawValue] = currentProgress - 1
-          
+
           try await questManager.updateDocument(
             id: quest.id,
             data: ["userProgress": updatedUserProgress]
@@ -255,7 +260,6 @@ private extension QuestProgressManager {
   
   func initializeQuizProgress(quests: [QuestModel]) async {
     do {
-      let quizManager = FirestoreManager<QuizModel>(collection: "quizzes")
       let quizzes = try await quizManager.fetch()
 
       let completedQuizzes = quizzes.filter { quiz in
@@ -279,7 +283,6 @@ private extension QuestProgressManager {
   
   func initializeEventProgress(quests: [QuestModel]) async {
     do {
-      let eventManager = FirestoreManager<EventModel>(collection: "events")
       let events = try await eventManager.fetch()
 
       let participatedEvents = events.filter { event in
@@ -310,7 +313,6 @@ private extension QuestProgressManager {
   
   func initializeAchievementProgress(quests: [QuestModel]) async {
     do {
-      let achievementManager = FirestoreManager<CountryAchievementModel>(collection: "achievements")
       let achievements = try await achievementManager.fetch()
 
       let unlockedAchievements = achievements.filter { achievement in
