@@ -20,11 +20,12 @@ struct ActionButtonLabel: View {
     .foregroundColor(style == .filled ? .white : color)
     .frame(maxWidth: .infinity)
     .padding()
-    .background(
-      style == .filled
-      ? color
-      : color.opacity(0.1)
-    )
+//    .background(
+//      style == .filled
+//      ? Color("AccentColour")
+//      : Color("AccentColour").opacity(0.1)
+//    )
+    .background(Color(.accentColour))
     .clipShape(RoundedRectangle(cornerRadius: Spacing.medium))
   }
 }

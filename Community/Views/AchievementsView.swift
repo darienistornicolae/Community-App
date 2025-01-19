@@ -16,16 +16,19 @@ struct AchievementsView: View {
             Text("\(viewModel.unlockedCount) of \(viewModel.totalCount)")
               .font(.title2)
               .bold()
-
+              .background(Color(.primaryColour))
+            
             ProgressView(value: viewModel.progressPercentage)
-              .tint(.green)
+              .tint(.accentColour)
               .padding(.horizontal)
-
+              .background(Color(.primaryColour))
+            
             Text("Countries Unlocked")
-              .foregroundColor(.gray)
+              .foregroundColor(.accentColour)
+              .background(Color(.primaryColour))
           }
           .padding()
-          .background(Color(.systemBackground))
+          .background(Color(.primaryColour))
 
           LazyVGrid(columns: columns, spacing: Spacing.default) {
             ForEach(viewModel.allCountries) { country in
@@ -37,9 +40,11 @@ struct AchievementsView: View {
                 }
             }
           }
+          .background(Color(.primaryColour))
           .padding()
         }
       }
+      .background(Color(.primaryColour))
       .navigationTitle("Countries")
     }
   }

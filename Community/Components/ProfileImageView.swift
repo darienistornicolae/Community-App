@@ -15,7 +15,7 @@ struct ProfileImageView: View {
       Image(systemName: "person.circle.fill")
         .resizable()
         .frame(width: 80, height: 80)
-        .foregroundColor(.gray)
+        .foregroundColor(.secondaryColour)
     }
   }
 }

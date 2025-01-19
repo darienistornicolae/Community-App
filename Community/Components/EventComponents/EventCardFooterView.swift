@@ -15,7 +15,7 @@ struct EventCardFooterView: View {
       } label: {
         Image(systemName: isLiked ? "heart.fill" : "heart")
           .font(.title2)
-          .foregroundColor(isLiked ? .red : .primary)
+          .foregroundColor(isLiked ? .accentColour : .accentColour)
           .symbolEffect(.bounce, value: isLiked)
       }
       .disabled(event.hasEnded)
@@ -26,6 +26,7 @@ struct EventCardFooterView: View {
       } label: {
         Image(systemName: "bubble.right")
           .font(.title2)
+          .foregroundColor(.accentColour)
       }
       .disabled(event.hasEnded)
       .opacity(event.hasEnded ? 0.6 : 1.0)

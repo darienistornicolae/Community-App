@@ -16,7 +16,7 @@ struct GridPostsView: View {
           .aspectRatio(1, contentMode: .fill)
           .overlay(
             Image(systemName: "photo")
-              .foregroundColor(.white)
+              .foregroundColor(.secondaryColour)
           )
       }
     }

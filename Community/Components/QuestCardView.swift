@@ -11,16 +11,17 @@ struct QuestCardView: View {
           Text(quest.title)
             .font(.headline)
 
+
           Text(quest.requirement.description)
             .font(.subheadline)
-            .foregroundColor(.gray)
+            .foregroundColor(.black)
         }
 
         Spacer()
 
         Text("\(quest.points) pts")
           .font(.headline)
-          .foregroundColor(.blue)
+          .foregroundColor(.accentColour)
       }
 
       GeometryReader { geometry in
@@ -30,7 +31,7 @@ struct QuestCardView: View {
             .frame(height: 8)
 
           RoundedRectangle(cornerRadius: Spacing.small)
-            .fill(Color.green)
+            .fill(Color.accentColour)
             .frame(width: geometry.size.width * quest.progressPercentage, height: 8)
         }
       }
@@ -40,14 +41,14 @@ struct QuestCardView: View {
       HStack {
         Label(quest.endDate.formatted(date: .abbreviated, time: .omitted), systemImage: "calendar")
           .font(.caption)
-          .foregroundColor(.gray)
+          .foregroundColor(.accentColour)
 
         Spacer()
 
         if let total = quest.requirement.totalRequired {
           Text("\(quest.currentUserProgress)/\(total)")
             .font(.caption)
-            .foregroundColor(.gray)
+            .foregroundColor(.black)
         }
         
         if quest.isCompleted {
@@ -58,7 +59,7 @@ struct QuestCardView: View {
       }
     }
     .padding()
-    .background(Color(.systemBackground))
+    .background(Color.secondaryColour)
     .clipShape(RoundedRectangle(cornerRadius: Spacing.medium))
     .shadow(color: .black.opacity(0.1), radius: 5)
   }

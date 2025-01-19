@@ -26,7 +26,7 @@ struct EventCardHeaderView: View {
             Image(systemName: "person.crop.circle.fill")
               .resizable()
               .padding(Spacing.small)
-              .foregroundColor(.gray)
+              .foregroundColor(.accentColour)
           )
       }
 
@@ -35,7 +35,7 @@ struct EventCardHeaderView: View {
           .font(.headline)
         Text(event.location)
           .font(.subheadline)
-          .foregroundColor(.gray)
+          .foregroundColor(.accentColour)
       }
 
       Spacer()
@@ -54,7 +54,7 @@ struct EventCardHeaderView: View {
         }
       } label: {
         Image(systemName: "ellipsis")
-          .foregroundColor(.primary)
+          .foregroundColor(.accentColor)
           .padding(Spacing.small)
       }
     }

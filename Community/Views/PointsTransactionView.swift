@@ -38,7 +38,7 @@ struct PointsTransactionView: View {
       .navigationBarTitleDisplayMode(.inline)
       .toolbar {
         ToolbarItem(placement: .topBarLeading) {
-          Button("Done") {
+          Button("Close") {
             dismiss()
           }
         }

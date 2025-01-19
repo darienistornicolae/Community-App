@@ -20,7 +20,7 @@ struct SettingsRow: View {
         Spacer()
         Image(systemName: "chevron.right")
           .font(.system(size: 14))
-          .foregroundColor(.gray)
+          .foregroundColor(.primaryColour)
       }
     }
     .onTapGesture {
